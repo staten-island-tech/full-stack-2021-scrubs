@@ -1,32 +1,45 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link id="home" to="/">Home</router-link> 
+      <router-link id="about" to="/about">About</router-link> 
+      <router-link id="play" to="/play">Play</router-link> 
+      <router-link id="credits" to="/credits">Credits</router-link> 
+      <router-link id="donate" to="/donate">Donate</router-link> 
     </div>
     <router-view />
   </div>
 </template>
 
 <style lang="scss">
+body{
+  font-size: 62.5%;
+}
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
 }
 
 #nav {
-  padding: 30px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 1.5rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  border-style: solid;
+}
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+#nav * {
+  border-style: solid;
+  border-radius: 2rem;
+  margin: auto;
+  padding: 40px;
+  background-image: linear-gradient(to right,#ee9ca7, #ffdde1);
+  transition: 0.5s;
+}
 
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+#nav *:hover {
+  order: 0;
+  flex-grow: 0.25;
 }
 </style>
