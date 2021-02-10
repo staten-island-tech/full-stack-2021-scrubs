@@ -1,7 +1,5 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
     <h2 v-if="isLoggedIn">Welcome Back!</h2>
     <button v-if="isLoggedIn" @click="logout">Logout</button>
     <template v-else>
@@ -10,26 +8,25 @@
     <button @click="signup" v-if="hasAccount">Sign Up</button>
     </template>
     <template v-if="creatingAccount">
-    <input placeholder="E-mail">
-    <input placeholder="Password">
+    <input v-model="email" placeholder="E-mail">
+    <input v-model="password" placeholder="Password">
     </template>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
 
 export default {
   name: "Home",
-  components: {
-    HelloWorld
-  },
   data() {
     return {
       isLoggedIn: false,
       hasAccount: true,
       creatingAccount: false,
+
+      userEmail: "",
+      userPassword: "",
     };
   },
   methods: {
