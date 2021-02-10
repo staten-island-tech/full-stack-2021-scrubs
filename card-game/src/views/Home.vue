@@ -8,8 +8,10 @@
     <button @click="signup" v-if="hasAccount">Sign Up</button>
     </template>
     <template v-if="creatingAccount">
+    <form id="signup-form" @submit.prevent="processForm">
     <input v-model="email" placeholder="E-mail">
     <input v-model="password" placeholder="Password">
+    </form>
     </template>
   </div>
 </template>
@@ -25,8 +27,8 @@ export default {
       hasAccount: true,
       creatingAccount: false,
 
-      userEmail: "",
-      userPassword: "",
+      email: "",
+      password: "",
     };
   },
   methods: {
@@ -39,6 +41,9 @@ export default {
     signup: function() {
       this.hasAccount = false;
       this.creatingAccount = true;
+    },
+    processForm: function() {
+      console.log({ name: this.name, email: this.email });
     },
   }
 };
