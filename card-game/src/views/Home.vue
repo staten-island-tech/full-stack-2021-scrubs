@@ -5,12 +5,13 @@
     <template v-else>
     <h2 v-if="hasAccount">Login or SignUp</h2>
     <button @click="login" v-if="hasAccount">Login</button>
-    <button @click="signup" v-if="hasAccount">Sign Up</button>
+    <button @click="signupButton" v-if="hasAccount">Sign Up</button>
     </template>
     <template v-if="creatingAccount">
     <form id="signup-form" @submit.prevent="processForm">
     <input v-model="email" placeholder="E-mail">
     <input v-model="password" placeholder="Password">
+    <button type="submit">Complete Sign-Up</button>
     </form>
     </template>
   </div>
@@ -38,12 +39,13 @@ export default {
     logout: function() {
       this.isLoggedIn = false;
     },
-    signup: function() {
+    signupButton: function() {
       this.hasAccount = false;
       this.creatingAccount = true;
     },
     processForm: function() {
-      console.log({ name: this.name, email: this.email });
+      console.log({ password: this.password, email: this.email });
+      auth.createUserWithEmailAndPassword(this.email, this.password);
     },
   }
 };
