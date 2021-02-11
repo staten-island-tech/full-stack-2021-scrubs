@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="game-board-container">
+        <div id="1" class="game-square"></div>
+        <div id="2" class="game-square"></div>
+        <div id="3" class="game-square"></div>
+        <div id="4" class="game-square"></div>
+        <div id="5" class="game-square"></div>
+        <div id="6" class="game-square"></div>
+        <div id="7" class="game-square"></div>
+        <div id="8" class="game-square"></div>
+        <div id="9" class="game-square"></div>
+    </div>
+    <!-- <input type="button" class="update-btn btn" value="Update">
+    <input type="button" class="read-btn btn" value="Read"> -->
+    <input type="button" class="new-game-btn btn" value="New Game">
+<script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-analytics.js"></script>
+
+<script>
+    var firebaseConfig = {
+      apiKey: PLACEHOLDER,
+      authDomain: PLACEHOLDER,
+      projectId: PLACEHOLDER,
+      storageBucket: PLACEHOLDER,
+      messagingSenderId: PLACEHOLDER,
+      appId: PLACEHOLDER,
+      measurementId: PLACEHOLDER
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
+
+<script src="index.js"></script>    
+</body>
+</html>
