@@ -45,7 +45,6 @@ export default {
     },
     processForm: function() {
       console.log({ password: this.password, email: this.email });
-      auth.createUserWithEmailAndPassword(this.email, this.password);
     },
   }
 };
