@@ -20,6 +20,8 @@
 <script>
 // @ is an alias to /src
 
+import { auth } from '@/firebase';
+
 export default {
   name: "Home",
   data() {
@@ -45,6 +47,9 @@ export default {
     },
     processForm: function() {
       console.log({ password: this.password, email: this.email });
+      auth.createUserWithEmailAndPassword(this.email, this.password).then(cred => {
+        console.log(cred);
+      });
     },
   }
 };
