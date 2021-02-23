@@ -1,18 +1,27 @@
 <template>
   <div class="home">
-    <h2 v-if="isLoggedIn">Welcome Back!</h2>
-    <button v-if="isLoggedIn" @click="logout">Logout</button>
-    <template v-else>
-    <h2 v-if="hasAccount">Login or SignUp</h2>
-    <button @click="login" v-if="hasAccount">Login</button>
-    <button @click="signupButton" v-if="hasAccount">Sign Up</button>
+    <template v-if="accountStatus === 'loggedin'">
+      <h2>Welcome!</h2>
+      <button @click="logout">Logout</button>
     </template>
-    <template v-if="creatingAccount">
-    <form id="signup-form" @submit.prevent="processForm">
-    <input v-model="email" placeholder="E-mail">
-    <input v-model="password" placeholder="Password">
-    <button type="submit">Complete Sign-Up</button>
-    </form>
+    <template v-if="accountStatus === 'loggingin'">
+        <form id="login-form" @submit.prevent="processForm">
+        <input v-model="email" placeholder="E-mail">
+        <input v-model="password" placeholder="Password">
+        <button type="submit">Complete Log-In</button>
+        </form>
+    </template>
+    <template v-if="accountStatus === 'loggedout'">
+      <h2>Login or SignUp</h2>
+      <button @click="login">Login</button>
+      <button @click="signupButton">Sign Up</button>
+    </template>
+    <template v-if="accountStatus === 'registering'">
+      <form id="signup-form" @submit.prevent="processForm">
+        <input v-model="email" placeholder="E-mail">
+        <input v-model="password" placeholder="Password">
+        <button type="submit">Complete Sign-Up</button>
+      </form>
     </template>
   </div>
 </template>
@@ -26,29 +35,27 @@ export default {
   name: "Home",
   data() {
     return {
-      isLoggedIn: false,
-      hasAccount: true,
-      creatingAccount: false,
-
+      accountStatus: "loggedout",
       email: "",
       password: "",
     };
   },
   methods: {
     login: function() {
-      this.isLoggedIn = true;
+      this.accountStatus = "loggingin";
     },
     logout: function() {
-      this.isLoggedIn = false;
+      auth.signOut().then(() => {
+        this.accountStatus = "loggedout";
+      });
     },
     signupButton: function() {
-      this.hasAccount = false;
-      this.creatingAccount = true;
+      this.accountStatus = "registering";
     },
     processForm: function() {
-      console.log({ password: this.password, email: this.email });
       auth.createUserWithEmailAndPassword(this.email, this.password).then(cred => {
         console.log(cred);
+        this.accountStatus = "loggedin";
       });
     },
   }
