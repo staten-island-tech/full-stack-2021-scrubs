@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input type="text" id="username" value="Username">
+    <input type="text" id="password" value="Password">
+    <input type="button" class="sign-in-btn btn" value="Sign In">
+    <input type="button" class="create-account-display-btn btn" value="Create Account">
+    <input type="text" id="username-create" value="Username">
+    <input type="text" id="password-create" value="Password">
+    <input type="button" class="create-account-btn btn" value="Create Account">
+
+    <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-analytics.js"></script>
+    <script src="index.js"></script>    
+    <script>
+        var firebaseConfig = {
+          apiKey: PLACEHOLDER,
+          authDomain: PLACEHOLDER,
+          projectId: PLACEHOLDER,
+          storageBucket: PLACEHOLDER,
+          messagingSenderId: PLACEHOLDER,
+          appId: PLACEHOLDER
+        };
+        firebase.initializeApp(firebaseConfig);
+      </script>
+</body>
+</html>
