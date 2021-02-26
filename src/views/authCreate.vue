@@ -10,6 +10,7 @@
 import { firebase } from "@firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
+require('dotenv').config();
 
 var firebaseConfig = {
   apiKey: "PLACEHOLDER",
@@ -31,8 +32,11 @@ export default {
   },
   methods: {
     createAccount: function() {
+        console.log(this.usernameCreate)
+        console.log(this.passwordCreate)
         firebase.auth().createUserWithEmailAndPassword(this.usernameCreate, this.passwordCreate)
         this.$router.push({ name: 'auth' });
+
     }
     },
 }

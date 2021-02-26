@@ -2,6 +2,3 @@
 node_modules
 .gitattributes
 babel.conf.js
-package-lock.json
-package.json
-README.md

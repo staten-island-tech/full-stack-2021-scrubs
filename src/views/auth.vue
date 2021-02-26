@@ -20,6 +20,7 @@ export default {
   methods: {
     signIn: function() {
         firebase.auth().signInWithEmailAndPassword(this.username, this.password)
+        console.log("signed in")
         this.$router.push({ name: 'signedIn' });
 
     },
