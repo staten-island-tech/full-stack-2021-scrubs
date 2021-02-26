@@ -1,5 +1,17 @@
 <template>
   <div class="play">
-    <h1>This is a play page</h1>
+    <BigTwo />
   </div>
 </template>
+
+<script>
+
+import BigTwo from '@/components/BigTwo.vue'
+
+export default {
+  name: "Play",
+  components: {
+    BigTwo
+  }
+}
+</script>
