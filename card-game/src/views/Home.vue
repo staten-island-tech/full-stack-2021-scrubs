@@ -41,33 +41,47 @@ export default {
     };
   },
   methods: {
+    //switch to login form
     loginButton: function() {
       this.accountStatus = "loggingin";
     },
+    //logs user in
     loginForm: function() {
       auth.signInWithEmailAndPassword(this.email, this.password).then(cred => {
         console.log(cred);
-        this.accountStatus = "loggedin";
         this.email = "";
         this.password = "";
       });
     },
+    //logs user out
     logout: function() {
       auth.signOut().then(() => {
         this.accountStatus = "loggedout";
       });
     },
+    //switches to signup form
     signupButton: function() {
       this.accountStatus = "registering";
     },
+    //signs user up
     signupForm: function() {
       auth.createUserWithEmailAndPassword(this.email, this.password).then(cred => {
         console.log(cred);
-        this.accountStatus = "loggedin";
         this.email = "";
         this.password = "";
       });
     },
+  },
+  created: function () {
+    auth.onAuthStateChanged(user => {
+    if (user) {
+      console.log("user logged in");
+      this.accountStatus = "loggedin";
+    }
+    else {
+      console.log("user not signed in");
+    }
+    });
   }
 };
 </script>
