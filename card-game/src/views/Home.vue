@@ -48,6 +48,8 @@ export default {
       auth.signInWithEmailAndPassword(this.email, this.password).then(cred => {
         console.log(cred);
         this.accountStatus = "loggedin";
+        this.email = "";
+        this.password = "";
       });
     },
     logout: function() {
@@ -62,6 +64,8 @@ export default {
       auth.createUserWithEmailAndPassword(this.email, this.password).then(cred => {
         console.log(cred);
         this.accountStatus = "loggedin";
+        this.email = "";
+        this.password = "";
       });
     },
   }
