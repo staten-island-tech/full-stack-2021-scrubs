@@ -1,27 +1,12 @@
 <template>
   <div class="container">
-    <input type = "text" v-on:input=" usernameCreate= $event.target.value" placeholder="Username"/>
-    <input type = "text" v-on:input=" passwordCreate= $event.target.value" placeholder="Password"/>
+    <input type = "text" v-on:input=" usernameCreate= $event.target.value" placeholder="Username" ref = "usernameCreate"/>
+    <input type = "text" v-on:input=" passwordCreate= $event.target.value" placeholder="Password" ref = "passwordCreate"/>
     <button @click="createAccount()">Create Account</button>
-
   </div>
 </template>
 <script>
-import { firebase } from "@firebase/app";
-import "firebase/auth";
-import "firebase/firestore";
-require('dotenv').config();
-
-var firebaseConfig = {
-  apiKey: "PLACEHOLDER",
-  authDomain: "PLACEHOLDER",
-  projectId: "PLACEHOLDER",
-  storageBucket: "PLACEHOLDER",
-  messagingSenderId: "PLACEHOLDER",
-  appId: "PLACEHOLDER",
-};
-firebase.initializeApp(firebaseConfig);
-
+import {auth} from "@/firebase"
 
 export default {
           data() {
@@ -34,9 +19,16 @@ export default {
     createAccount: function() {
         console.log(this.usernameCreate)
         console.log(this.passwordCreate)
-        firebase.auth().createUserWithEmailAndPassword(this.usernameCreate, this.passwordCreate)
-        this.$router.push({ name: 'auth' });
-
+        auth.createUserWithEmailAndPassword(this.usernameCreate, this.passwordCreate)  .then((userCredential) => {
+          console.log(userCredential)
+          auth.signOut()
+          this.$router.push({ name: 'auth' });
+        }).catch((error) => {
+          var errorMessage = error.message;
+          alert(errorMessage);
+          this.$refs["usernameCreate"].value = "";
+          this.$refs["passwordCreate"].value = "";
+        });
     }
     },
 }

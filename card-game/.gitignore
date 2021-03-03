@@ -1,4 +1,4 @@
-.env
+pseudo-env.js
 node_modules
 .gitattributes
 babel.conf.js
