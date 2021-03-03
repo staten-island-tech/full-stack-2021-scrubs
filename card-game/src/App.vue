@@ -2,10 +2,10 @@
   <div id="app">
     <div id="nav">
       <router-link id="home" to="/">Home</router-link> 
-      <router-link id="about" to="/about">About</router-link> 
-      <router-link id="play" to="/play">Play</router-link> 
-      <router-link id="credits" to="/credits">Credits</router-link> 
-      <router-link id="donate" to="/donate">Donate</router-link> 
+      <router-link id="about" to="/About">About</router-link> 
+      <router-link id="games" to="/Games">Games</router-link> 
+      <router-link id="credits" to="/Credits">Credits</router-link> 
+      <router-link id="donate" to="/Donate">Donate</router-link> 
     </div>
     <router-view />
   </div>
