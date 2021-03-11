@@ -1,0 +1,163 @@
+<template>
+  <div>
+    <button id="leave">
+      <router-link :to="lobby">Leave</router-link>
+    </button>
+    <div v-if="!gameStarted" class="game-interface">
+      <hr />
+      {{ lobbyName }}
+      <hr />
+      <p v-for="(player, index) in players" :key="index">
+        {{ player.name }}
+      </p>
+      <button @click="deal">Start</button>
+    </div>
+    <div v-if="gameStarted">
+      <div v-for="(hands, index) in players" :key="index" class="players">
+        <div v-if="hands.player">
+          {{ hands.name }}
+          <div v-for="cards in hands.hand" :key="cards.code">
+            <img :src="cards.image" :alt="cards.code" class="card-image" />
+          </div>
+          <button @click="hit(hands.hand)">Hit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { deck } from "../../deck/deck.js";
+import axios from "axios";
+
+export default {
+  name: "Game",
+  data() {
+    return {
+      lobby: "../../views/Lobbies/BlackJackLobby.vue",
+      deckV: [],
+      lobbyName: "Lobby1",
+      players: [
+        {
+          player: true,
+          hand: [],
+          name: "Joe"
+        },
+        {
+          player: true,
+          hand: [],
+          name: "Joe1"
+        },
+        {
+          player: true,
+          hand: [],
+          name: "joe2"
+        },
+        {
+          player: true,
+          hand: [],
+          name: "Joe3"
+        },
+        {
+          player: false,
+          hand: [],
+          name: ""
+        },
+        {
+          player: false,
+          hand: [],
+          name: ""
+        },
+        {
+          player: false,
+          hand: [],
+          name: ""
+        },
+        {
+          player: false,
+          hand: [],
+          name: ""
+        }
+      ],
+      gameStarted: false,
+      rotation: false,
+      spectate: true,
+      finished: false,
+      key: ""
+    };
+  },
+  methods: {
+    randomDeck() {
+      return Math.floor(Math.random() * this.deckV.length);
+    },
+    deal() {
+      let vm = this;
+      vm.gameStarted = true;
+      vm.deckV = [];
+      deck.forEach(function(cards) {
+        vm.deckV.push(cards);
+      });
+      vm.players.forEach(function(hands) {
+        hands.hand = [];
+        if (hands.player == true) {
+          for (let i = 0; i < 2; i++) {
+            hands.hand.push(vm.deckV[vm.randomDeck()]);
+            let last = hands.hand.length - 1;
+            let remove = vm.deckV.indexOf(hands.hand[last]);
+            vm.deckV.splice(remove, 1);
+          }
+        }
+      });
+      axios
+        .post("https://card-game-9455b-default-rtdb.firebaseio.com/game.json", {
+          player: this.players
+        })
+        .then(function() {
+          axios
+            .get(
+              "https://card-game-9455b-default-rtdb.firebaseio.com/game.json"
+            )
+            .then(response => {
+              console.log(response);
+              const data = response.data;
+              for (let key in data) {
+                vm.key = key;
+                console.log(vm.key);
+              }
+            });
+        });
+    },
+    hit(playerHand) {
+      playerHand.push(this.deckV[this.randomDeck()]);
+      axios.patch(
+        `https://card-game-9455b-default-rtdb.firebaseio.com/game/${this.key}.json`,
+        {
+          player: this.players
+        }
+      );
+    }
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+.game-interface {
+  font-size: 20px;
+}
+
+#leave {
+  display: block;
+  text-align: left;
+}
+
+.players {
+  justify-content: space-evenly;
+  font-size: 10px;
+  width: 100%;
+  display: flex;
+}
+
+.card-image {
+  width: 30%;
+}
+</style>

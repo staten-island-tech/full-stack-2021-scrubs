@@ -13,7 +13,7 @@ export default {
   },
   data() {
     return {
-      game: "/PokerGame"
+      game: "/BlackJackGame"
     };
   }
 };

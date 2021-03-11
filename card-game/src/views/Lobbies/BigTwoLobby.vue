@@ -1,29 +1,29 @@
 <template>
-    <div>
-        <Lobby :gameType="game"/>
-    </div>
+  <div>
+    <Lobby :gameType="game" />
+  </div>
 </template>
 
 <script>
-import Lobby from '@/components/Lobby.vue'
+import Lobby from "@/components/Lobby.vue";
 
-    export default {
-        components: {
-            Lobby
-        },
-        data(){
-            return{
-                game: '/BigTwoGame'
-            }
-        }
-    }
+export default {
+  components: {
+    Lobby
+  },
+  data() {
+    return {
+      game: "/BigTwoGame"
+    };
+  }
+};
 </script>
 
 <style lang="scss" scoped>
-div{
-    font-size: 20px;
+div {
+  font-size: 20px;
 }
-#games{
-    text-align: left;
+#games {
+  text-align: left;
 }
 </style>
