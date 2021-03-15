@@ -1,7 +1,7 @@
 <template>
   <div>
     <button id="leave">
-      <router-link :to="lobby">Leave</router-link>
+      <router-link to="/BlackJackLobby">Leave</router-link>
     </button>
     <div v-if="!gameStarted" class="game-interface">
       <hr />
@@ -28,7 +28,7 @@
 
 <script>
 import { deck } from "../../deck/deck.js";
-import axios from "axios";
+/* import axios from "axios"; */
 
 export default {
   name: "Game",
@@ -108,7 +108,7 @@ export default {
           }
         }
       });
-      axios
+/*       axios
         .post("https://card-game-9455b-default-rtdb.firebaseio.com/game.json", {
           player: this.players
         })
@@ -125,16 +125,16 @@ export default {
                 console.log(vm.key);
               }
             });
-        });
+        }); */
     },
     hit(playerHand) {
       playerHand.push(this.deckV[this.randomDeck()]);
-      axios.patch(
+/*       axios.patch(
         `https://card-game-9455b-default-rtdb.firebaseio.com/game/${this.key}.json`,
         {
           player: this.players
         }
-      );
+      ); */
     }
   }
 };
