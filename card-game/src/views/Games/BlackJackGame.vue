@@ -17,7 +17,7 @@
         <div v-if="hands.player">
           {{ hands.name }}
           <div v-for="cards in hands.hand" :key="cards.code">
-            <img :src="cards.image" :alt="cards.code" class="card-image" />
+            <img :src="`${cards.image}`" :alt="cards.code" class="card-image" />
           </div>
           <button @click="hit(hands.hand)">Hit</button>
         </div>
@@ -96,6 +96,7 @@ export default {
       vm.deckV = [];
       deck.forEach(function(cards) {
         vm.deckV.push(cards);
+        console.log(cards.image);
       });
       vm.players.forEach(function(hands) {
         hands.hand = [];
