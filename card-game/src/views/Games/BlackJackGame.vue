@@ -40,41 +40,49 @@ export default {
       players: [
         {
           player: true,
+          cardScore: 0,
           hand: [],
           name: "Joe"
         },
         {
           player: true,
+          cardScore: 0,
           hand: [],
           name: "Joe1"
         },
         {
           player: true,
+          cardScore: 0,
           hand: [],
           name: "joe2"
         },
         {
           player: true,
+          cardScore: 0,
           hand: [],
           name: "Joe3"
         },
         {
           player: false,
+          cardScore: 0,
           hand: [],
           name: ""
         },
         {
           player: false,
+          cardScore: 0,
           hand: [],
           name: ""
         },
         {
           player: false,
+          cardScore: 0,
           hand: [],
           name: ""
         },
         {
           player: false,
+          cardScore: 0,
           hand: [],
           name: ""
         }
@@ -96,7 +104,6 @@ export default {
       vm.deckV = [];
       deck.forEach(function(cards) {
         vm.deckV.push(cards);
-        console.log(cards.image);
       });
       vm.players.forEach(function(hands) {
         hands.hand = [];
@@ -107,35 +114,17 @@ export default {
             let remove = vm.deckV.indexOf(hands.hand[last]);
             vm.deckV.splice(remove, 1);
           }
+          hands.hand.forEach((card => {
+            hands.cardScore += card.blackjack;
+            })
+          );
+        //let totalDeck = hands.cardScore;
+        //console.log(totalDeck);
         }
       });
-/*       axios
-        .post("https://card-game-9455b-default-rtdb.firebaseio.com/game.json", {
-          player: this.players
-        })
-        .then(function() {
-          axios
-            .get(
-              "https://card-game-9455b-default-rtdb.firebaseio.com/game.json"
-            )
-            .then(response => {
-              console.log(response);
-              const data = response.data;
-              for (let key in data) {
-                vm.key = key;
-                console.log(vm.key);
-              }
-            });
-        }); */
     },
     hit(playerHand) {
       playerHand.push(this.deckV[this.randomDeck()]);
-/*       axios.patch(
-        `https://card-game-9455b-default-rtdb.firebaseio.com/game/${this.key}.json`,
-        {
-          player: this.players
-        }
-      ); */
     }
   }
 };
