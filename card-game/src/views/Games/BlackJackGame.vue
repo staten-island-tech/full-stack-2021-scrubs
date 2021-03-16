@@ -16,10 +16,16 @@
       <div v-for="(hands, index) in players" :key="index" class="players">
         <div v-if="hands.player">
           {{ hands.name }}
-          <div v-for="cards in hands.hand" :key="cards.code">
-            <img :src="`${cards.image}`" :alt="cards.code" class="card-image" />
+          <br>
+          Score: {{hands.cardScore}}
+          <br>
+          <div v-if="hands.blackJack">
+            BlackJack!!!
           </div>
-          <button @click="hit(hands.hand)">Hit</button>
+          <div v-for="cards in hands.hand" :key="cards.code">
+            <img :src="cards.image" :alt="cards.code" class="card-image" />
+          </div>
+          <button v-if="hands.canHit" @click="hit(hands)">Hit</button>
         </div>
       </div>
     </div>
@@ -28,7 +34,7 @@
 
 <script>
 import { deck } from "../../deck/deck.js";
-import { database } from "./firebase.js";
+/* import { database } from "./firebase.js"; */
 
 export default {
   name: "Game",
@@ -42,20 +48,23 @@ export default {
           player: true,
           cardScore: 0,
           hand: [],
-          name: "Player 1"
+          name: "Player 1",
+          canHit: true,
+          blackJack: false
         },
         {
           player: true,
           cardScore: 0,
           hand: [],
-          name: "Player 2"
+          name: "Player 2",
+          canHit: true,
+          blackJack: false
         },
       ],
       gameStarted: false,
       rotation: false,
       spectate: true,
       finished: false,
-      key: ""
     };
   },
   methods: {
@@ -91,13 +100,24 @@ export default {
             })
           );
         }
+        vm.check(hands)
       });
-      database.collection("games").add({
+/*       database.collection("games").add({
         playerData: vm.players
-      });
+      }); */
     },
     hit(playerHand) {
-      playerHand.push(this.deckV[this.randomDeck()]);
+      playerHand.hand.push(this.deckV[this.randomDeck()]);
+      playerHand.cardScore += playerHand.hand[playerHand.hand.length - 1].blackjack;
+      this.check(playerHand)
+    },
+    check(parameter){
+      if (parameter.cardScore > 21){
+        parameter.canHit = false
+      }else if(parameter.cardScore == 21){
+        parameter.canHit = false
+        parameter.blackJack = true
+      }
     }
   }
 };
