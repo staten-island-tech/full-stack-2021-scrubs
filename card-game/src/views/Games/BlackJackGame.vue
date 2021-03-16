@@ -28,6 +28,7 @@
 
 <script>
 import { deck } from "../../deck/deck.js";
+import { database } from "./firebase.js";
 
 export default {
   name: "Game",
@@ -82,6 +83,9 @@ export default {
             })
           );
         }
+      });
+      database.collection("games").add({
+        playerData: vm.players
       });
     },
     hit(playerHand) {
