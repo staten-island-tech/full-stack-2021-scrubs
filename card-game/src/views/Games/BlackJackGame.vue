@@ -79,6 +79,14 @@ export default {
             vm.deckV.splice(remove, 1);
           }
           hands.hand.forEach((card => {
+            if (card.value == "ACE"){
+              if (hands.cardScore <= 11){
+                card.blackjack = 11;
+              }
+              else{
+                card.blackjack = 1;
+              }
+            }
             hands.cardScore += card.blackjack;
             })
           );
