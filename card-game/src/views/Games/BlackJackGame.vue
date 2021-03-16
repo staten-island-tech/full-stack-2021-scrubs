@@ -28,7 +28,6 @@
 
 <script>
 import { deck } from "../../deck/deck.js";
-/* import axios from "axios"; */
 
 export default {
   name: "Game",
@@ -42,50 +41,14 @@ export default {
           player: true,
           cardScore: 0,
           hand: [],
-          name: "Joe"
+          name: "Player 1"
         },
         {
           player: true,
           cardScore: 0,
           hand: [],
-          name: "Joe1"
+          name: "Player 2"
         },
-        {
-          player: true,
-          cardScore: 0,
-          hand: [],
-          name: "joe2"
-        },
-        {
-          player: true,
-          cardScore: 0,
-          hand: [],
-          name: "Joe3"
-        },
-        {
-          player: false,
-          cardScore: 0,
-          hand: [],
-          name: ""
-        },
-        {
-          player: false,
-          cardScore: 0,
-          hand: [],
-          name: ""
-        },
-        {
-          player: false,
-          cardScore: 0,
-          hand: [],
-          name: ""
-        },
-        {
-          player: false,
-          cardScore: 0,
-          hand: [],
-          name: ""
-        }
       ],
       gameStarted: false,
       rotation: false,
@@ -118,8 +81,6 @@ export default {
             hands.cardScore += card.blackjack;
             })
           );
-        //let totalDeck = hands.cardScore;
-        //console.log(totalDeck);
         }
       });
     },
