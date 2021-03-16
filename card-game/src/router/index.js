@@ -4,10 +4,16 @@ import auth from "../views/auth.vue";
 import authCreate from "../views/authCreate.vue";
 import signedIn from "../views/signedIn.vue";
 import board from "../views/board.vue";
+import blackjack from "../views/blackjack.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
+  {
+    path: "/",
+    name: "blackjack",
+    component: blackjack,
+  },
   {
     path: "/",
     name: "board",
