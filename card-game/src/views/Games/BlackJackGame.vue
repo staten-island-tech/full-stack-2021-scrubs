@@ -13,19 +13,25 @@
       <button @click="deal">Start</button>
     </div>
     <div v-if="gameStarted">
+      <div v-for="player in players" :key="player.name">
+        <div v-if="player.turnOrder == 1">{{ player.name }}'s Turn</div>
+      </div>
       <div v-for="(hands, index) in players" :key="index" class="players">
         <div v-if="hands.player">
+          <div v-if="hands.turnOrder != 1">Waiting for a player...</div>
           {{ hands.name }}
-          <br>
-          Score: {{hands.cardScore}}
-          <br>
+          <br />
+          Score: {{ hands.cardScore }}
+          <br />
           <div v-if="hands.blackJack">
             BlackJack!!!
           </div>
+          <div v-if="hands.busted">Busted!!!</div>
           <div v-for="cards in hands.hand" :key="cards.code">
             <img :src="cards.image" :alt="cards.code" class="card-image" />
           </div>
           <button v-if="hands.canHit" @click="hit(hands)">Hit</button>
+          <button v-if="hands.canHit" @click="stand(hands)">Stand</button>
         </div>
       </div>
     </div>
@@ -33,32 +39,42 @@
 </template>
 
 <script>
-import { deck } from "../../deck/deck.js";
+import { deck } from '../../deck/deck.js';
 /* import { database } from "./firebase.js"; */
 
 export default {
-  name: "Game",
+  name: 'Game',
   data() {
     return {
-      lobby: "../../views/Lobbies/BlackJackLobby.vue",
+      lobby: '../../views/Lobbies/BlackJackLobby.vue',
       deckV: [],
-      lobbyName: "Lobby1",
+      lobbyName: 'Lobby1',
       players: [
         {
           player: true,
           cardScore: 0,
           hand: [],
-          name: "Player 1",
-          canHit: true,
-          blackJack: false
+          name: 'Player 1',
+          canHit: false,
+          blackJack: false,
+          busted: false,
+          turnOrder: null,
+          played: false,
+          stand: false,
+          result: '',
         },
         {
           player: true,
           cardScore: 0,
           hand: [],
-          name: "Player 2",
-          canHit: true,
-          blackJack: false
+          name: 'Player 2',
+          canHit: false,
+          blackJack: false,
+          busted: false,
+          turnOrder: null,
+          played: false,
+          stand: false,
+          result: '',
         },
       ],
       gameStarted: false,
@@ -87,39 +103,86 @@ export default {
             let remove = vm.deckV.indexOf(hands.hand[last]);
             vm.deckV.splice(remove, 1);
           }
-          hands.hand.forEach((card => {
-            if (card.value == "ACE"){
-              if (hands.cardScore <= 11){
-                card.blackjack = 11;
-              }
-              else{
-                card.blackjack = 1;
-              }
+          hands.hand.forEach((card) => {
+            if (card.value == 'ACE') {
+              card.blackjack = 11;
             }
             hands.cardScore += card.blackjack;
-            })
-          );
+          });
         }
-        vm.check(hands)
+        vm.check(hands);
       });
-/*       database.collection("games").add({
+      this.randomizeOrder();
+      /*       database.collection("games").add({
         playerData: vm.players
       }); */
     },
     hit(playerHand) {
-      playerHand.hand.push(this.deckV[this.randomDeck()]);
-      playerHand.cardScore += playerHand.hand[playerHand.hand.length - 1].blackjack;
-      this.check(playerHand)
+      let randomHit = this.deckV[this.randomDeck()];
+      playerHand.hand.push(randomHit);
+      let last = playerHand.hand.length - 1;
+      let remove = this.deckV.indexOf(playerHand.hand[last]);
+      this.deckV.splice(remove, 1);
+      playerHand.cardScore +=
+        playerHand.hand[playerHand.hand.length - 1].blackjack;
+      playerHand.hand.forEach((card) => {
+        if (card.value === 'ACE') {
+          if (playerHand.cardScore >= 21 && card.blackjack != 1) {
+            playerHand.cardScore -= card.blackjack;
+            card.blackjack = 1;
+            playerHand.cardScore += card.blackjack;
+          }
+        }
+      });
+      this.check(playerHand);
     },
-    check(parameter){
-      if (parameter.cardScore > 21){
-        parameter.canHit = false
-      }else if(parameter.cardScore == 21){
-        parameter.canHit = false
-        parameter.blackJack = true
+    stand(player) {
+      player.canHit = false;
+      player.played = true;
+      player.stand = true;
+      this.check(player);
+    },
+    check(playerStats) {
+      if (playerStats.cardScore > 21) {
+        playerStats.canHit = false;
+        playerStats.busted = true;
+        playerStats.played = true;
+      } else if (playerStats.cardScore == 21) {
+        playerStats.canHit = false;
+        playerStats.blackJack = true;
+        playerStats.played = true;
+      } else if (playerStats.stand == true) {
+        playerStats.canHit = false;
+        playerStats.played = true;
       }
-    }
-  }
+      if (playerStats.played === true) {
+        this.players.forEach((player) => {
+          player.turnOrder -= 1;
+          if (player.turnOrder <= 0) {
+            player.turnOrder = this.players.length;
+          }
+          if (player.turnOrder == 1 && !player.played) {
+            player.canHit = true;
+          }
+        });
+      }
+    },
+    randomizeOrder() {
+      let players = this.players.length;
+      let order = [];
+      for (let i = 1; i <= players; i++) {
+        order.push(i);
+      }
+      this.players.forEach((player) => {
+        let random = Math.floor(Math.random() * order.length);
+        player.turnOrder = order[random];
+        order.splice(random, 1);
+        if (player.turnOrder == 1) {
+          player.canHit = true;
+        }
+      });
+    },
+  },
 };
 </script>
 
