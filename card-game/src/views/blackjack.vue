@@ -6,9 +6,10 @@
       <button v-if= "connected" v-on:click="shuffleDeck">Shuffle Deck</button>
       <button v-if= "connected" v-on:click="hit">Hit</button>
       <button v-if= "connected" v-on:click="stand">Stand</button>
-      <!-- <img src="../assets/CardBack.png" /> -->
       <div v-if= "connected">Deck size is: {{deckSize}}</div>
+      <div v-if= "connected">Value of your cards is: {{cardValue}}</div>
       <div v-if= "connected">Opponent hand size is: {{opponentHandSize}}</div>
+      <div v-if= "connected">Event log: {{eventLog}}</div>
       <div id="player01hand"></div>
       <div id="player02hand"></div>
     </div>
@@ -25,7 +26,9 @@ export default {
     return {  
       connected: false,
       deckSize: 52,
-      opponentHandSize: 0
+      opponentHandSize: 0,
+      eventLog: "",
+      cardValue: 0
     };
   },
   methods: {
@@ -33,6 +36,9 @@ export default {
         gameID = `blackjack${this.gameID}`
     },
     connecttoGame: async function() {
+      await database.collection(gameID).doc("events").update({events: []});
+      await database.collection(gameID).doc('players').update({availableslots: ["player01", "player02"]});
+      await database.collection(gameID).doc('players').update({claimedslots: []});
       const playerInfo = await database.collection(gameID).doc("players").get();
       var availableSlots = playerInfo.data()["availableslots"]
       var claimedSlots = playerInfo.data()["claimedslots"]
@@ -62,6 +68,24 @@ export default {
           this.opponentHandSize = data["hand"].length;
         })
         }
+        const events = database.collection(gameID).doc("events");
+        events.onSnapshot(eventsSnapshot => {
+        const data = eventsSnapshot.data();
+        this.eventLog = data["events"]
+        })
+        const playerData = database.collection(gameID).doc(`${playerID}data`);
+        playerData.onSnapshot(playerDataSnapshot => {
+        const playerHand = playerDataSnapshot.data()["hand"];
+        var standValue = 0;
+        console.log(`Player hand is ${playerHand}`)
+        playerHand.forEach(function(card) {
+          console.log(card)
+          console.log(deck[card])
+          // standValue = standValue + deck[card]["blackjack"];
+          // this.cardValue = this.cardValue + deck[card]["blackjack"];
+        })
+        console.log(standValue)
+        })
       } else {
         alert("Game is full.");
       }
@@ -76,9 +100,17 @@ export default {
       await database.collection(gameID).doc('player01data').update({hand: []});
       await database.collection(gameID).doc('player02data').update({hand: []});
       document.getElementById(`${playerID}hand`).innerHTML = "";
+      const eventsData = await database.collection(gameID).doc('events').get()
+      var events = eventsData.data()["events"];
+      events.push(`${playerID} shuffled the deck`)
+      await database.collection(gameID).doc("events").update({events: events});
       },
     hit: async function() {
         // const deck = database.collection("blackjack01").doc("deck");
+        const eventsData = await database.collection(gameID).doc('events').get()
+        var events = eventsData.data()["events"];
+        events.push(`${playerID} hit`)
+        await database.collection(gameID).doc("events").update({events: events});
         const loadeddeck = await database.collection(gameID).doc("deck").get();
         const data = loadeddeck.data();
         const draw = data["array"].slice(0,1)
@@ -95,10 +127,16 @@ export default {
         document.getElementById(`${playerID}hand`).innerHTML = document.getElementById(`${playerID}hand`).innerHTML + `<img src=${image} />`;
       },
     stand: async function() {
+        const eventsData = await database.collection(gameID).doc('events').get()
+        var events = eventsData.data()["events"];
+        events.push(`${playerID} stood`)
+        await database.collection(gameID).doc("events").update({events: events});
         const playerData = await database.collection(gameID).doc(`${playerID}data`).get();
         var playerHand = playerData.data()["hand"];
+        console.log(`Player hand is ${playerHand}`)
         var standValue = 0;
         playerHand.forEach(function(card) {
+          console.log(card)
           standValue = standValue + deck[card]["blackjack"];
         })
         console.log(standValue)
