@@ -1,24 +1,27 @@
-import { firebase } from '@firebase/app'
+import {
+  firebase
+} from '@firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
 
 var firebaseConfig = {
-    apiKey: "AIzaSyBap8JR98WjEzNPrhd8JqhKfNdMZK44J_g",
-    authDomain: "deckofcardstest.firebaseapp.com",
-    projectId: "deckofcardstest",
-    storageBucket: "deckofcardstest.appspot.com",
-    messagingSenderId: "1097262054592",
-    appId: "1:1097262054592:web:89107de12ce2847c790125"
-  };
+  apiKey: "AIzaSyCQX_kaqDARgdz6veKLJYImO61f5a1yDug",
+  authDomain: "card-game-9455b.firebaseapp.com",
+  databaseURL: "https://card-game-9455b-default-rtdb.firebaseio.com",
+  projectId: "card-game-9455b",
+  storageBucket: "card-game-9455b.appspot.com",
+  messagingSenderId: "676118164486",
+  appId: "1:676118164486:web:66900cb4ab9fcd601f7f87"
+};
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
 
-  // some consts to use as references for future coding - makes life easier
-const database = firebase.firestore()
+// some consts to use as references for future coding - makes life easier
+const db = firebase.firestore()
 const auth = firebase.auth()
 
 export {
-    database,
-    auth
+  db,
+  auth
 }
