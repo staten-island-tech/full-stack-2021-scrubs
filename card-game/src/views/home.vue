@@ -4,6 +4,10 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap"
     />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
     <div class="container-buttons">
       <button class="container-buttons-button" v-on:click="play = !play">
         Play
@@ -63,10 +67,16 @@ html {
 .container-buttons {
   display: flex;
   justify-content: space-evenly;
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
 }
 
 .container-buttons-button {
+  margin-top: 10px;
   font-size: 3rem;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
   color: #ffd600;
   background: rgba(35, 17, 35, 0.42);
   border: 1px solid #231123;
