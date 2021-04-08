@@ -52,11 +52,12 @@ html {
 
 .container {
   height: 99vh;
-  background: radial-gradient(
-    50% 50% at 50% 50%,
-    rgba(172, 0, 0, 1) 0%,
-    rgba(105, 0, 0, 1) 100%
-  );
+  background-image: radial-gradient(
+      50% 50% at 50% 50%,
+      rgba(172, 0, 0, 0.87) 0%,
+      rgba(105, 0, 0, 0.87) 100%
+    ),
+    url(../assets/vegasbkgd.jpg);
 }
 
 .container-buttons {
