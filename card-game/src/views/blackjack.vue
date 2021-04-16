@@ -18,8 +18,20 @@ import { deck } from "../deck/deck.js"
 import {database} from "@/firebase"
 var gameID = "placeholder";
 var playerID = "placeholder";
-const deckcodes = Object.keys(deck)
-console.log(deckcodes)
+
+//variables to create an array that firebase likes, though there's got to be a better way of doing this...
+//const deckcodes = Object.keys(deck); array of keys from the deck.js
+let deckValues = Object.values(deck).map(a => a.blackjack); //map of the card values, matches up with the keys
+let deckIndex = -1;
+let baseDeck = [];
+Object.keys(deck).forEach(key => {
+  deckIndex += 1;
+  baseDeck.push({
+    cardKey: key,
+    cardValue: deckValues[deckIndex]
+  })
+});
+
 export default {
   data() {
     return {  
@@ -48,12 +60,14 @@ export default {
         deck.onSnapshot(deckSnapshot => {
           const data = deckSnapshot.data();
           this.deckSize = data["array"].length;
+          console.log(data);
         })
         if (playerID === "player01") {
           const opponentHand = database.collection(gameID).doc("player02data");
           opponentHand.onSnapshot(opponentHandSnapshot => {
           const data = opponentHandSnapshot.data();
           this.opponentHandSize = data["hand"].length;
+          this.shuffleDeck();
         })
         } else {
           const opponentHand = database.collection(gameID).doc("player01data");
@@ -67,20 +81,22 @@ export default {
       }
     },
     shuffleDeck: async function() {
-      for (let i = deckcodes.length - 1; i > -1; i--) {
+      for (let i = baseDeck.length - 1; i > -1; i--) {
         let j = Math.floor(Math.random() * (i + 1));
-        [deckcodes[i], deckcodes[j]] = [deckcodes[j], deckcodes[i]];
+        [baseDeck[i], baseDeck[j]] = [baseDeck[j], baseDeck[i]];
       }
-      const obj = {array: deckcodes}
+      const obj = {array: baseDeck}
       await database.collection(gameID).doc('deck').set(obj);
       await database.collection(gameID).doc('player01data').update({hand: []});
       await database.collection(gameID).doc('player02data').update({hand: []});
       document.getElementById(`${playerID}hand`).innerHTML = "";
       },
+
     hit: async function() {
         // const deck = database.collection("blackjack01").doc("deck");
         const loadeddeck = await database.collection(gameID).doc("deck").get();
         const data = loadeddeck.data();
+        console.log(data);
         const draw = data["array"].slice(0,1)
         data["array"].splice(0,1);
         const obj = {array: data["array"]}
@@ -94,6 +110,7 @@ export default {
         console.log(image)
         document.getElementById(`${playerID}hand`).innerHTML = document.getElementById(`${playerID}hand`).innerHTML + `<img src=${image} />`;
       },
+
     stand: async function() {
         const playerData = await database.collection(gameID).doc(`${playerID}data`).get();
         var playerHand = playerData.data()["hand"];
