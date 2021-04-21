@@ -4,10 +4,10 @@
       <button v-if= "!connected" @click="input()">Input</button>
       <button v-if= "!connected" v-on:click="connecttoGame">Connect to Game</button>
       <button v-if= "connected" v-on:click="shuffleDeck">Shuffle Deck</button>
-      <button v-if= "connected" v-on:click="hit">Hit</button>
-      <button v-if= "connected" v-on:click="stand">Stand</button>
+      <button v-if= "connected && active" v-on:click="hit">Hit</button>
+      <button v-if= "connected && active" v-on:click="stand">Stand</button>
       <div v-if= "connected">Deck size is: {{deckSize}}</div>
-      <div v-if= "connected">Value of your cards is: {{cardValue}}</div>
+      <div v-if= "connected">Value of your cards is: {{handValue}}</div>
       <div v-if= "connected">Opponent hand size is: {{opponentHandSize}}</div>
       <div v-if= "connected">Event log: {{eventLog}}</div>
       <div id="player01hand"></div>
@@ -20,15 +20,15 @@ import {database} from "@/firebase"
 var gameID = "placeholder";
 var playerID = "placeholder";
 const deckcodes = Object.keys(deck)
-console.log(deckcodes)
 export default {
   data() {
     return {  
       connected: false,
+      active: true,
       deckSize: 52,
+      handValue: 0,
       opponentHandSize: 0,
       eventLog: "",
-      cardValue: 0
     };
   },
   methods: {
@@ -37,14 +37,13 @@ export default {
     },
     connecttoGame: async function() {
       await database.collection(gameID).doc("events").update({events: []});
-      await database.collection(gameID).doc('players').update({availableslots: ["player01", "player02"]});
-      await database.collection(gameID).doc('players').update({claimedslots: []});
+      // await database.collection(gameID).doc('players').update({availableslots: ["player01", "player02"]});
+      // await database.collection(gameID).doc('players').update({claimedslots: []});
       const playerInfo = await database.collection(gameID).doc("players").get();
       var availableSlots = playerInfo.data()["availableslots"]
       var claimedSlots = playerInfo.data()["claimedslots"]
       if (availableSlots.length !== 0) {
         playerID = availableSlots[0]
-        console.log(playerID)
         this.connected = true;
         claimedSlots.push(playerID)
         availableSlots.splice(0,1);
@@ -72,19 +71,6 @@ export default {
         events.onSnapshot(eventsSnapshot => {
         const data = eventsSnapshot.data();
         this.eventLog = data["events"]
-        })
-        const playerData = database.collection(gameID).doc(`${playerID}data`);
-        playerData.onSnapshot(playerDataSnapshot => {
-        const playerHand = playerDataSnapshot.data()["hand"];
-        var standValue = 0;
-        console.log(`Player hand is ${playerHand}`)
-        playerHand.forEach(function(card) {
-          console.log(card)
-          console.log(deck[card])
-          // standValue = standValue + deck[card]["blackjack"];
-          // this.cardValue = this.cardValue + deck[card]["blackjack"];
-        })
-        console.log(standValue)
         })
       } else {
         alert("Game is full.");
@@ -120,11 +106,30 @@ export default {
         const playerData = await database.collection(gameID).doc(`${playerID}data`).get();
         var playerHand = playerData.data()["hand"];
         playerHand.push(draw[0])
-        console.log(playerHand)
+        // console.log(playerHand)
         await database.collection(gameID).doc(`${playerID}data`).update({hand: playerHand});
         const image = deck[playerHand[playerHand.length-1]]["image"]; 
-        console.log(image)
+        // console.log(image)
         document.getElementById(`${playerID}hand`).innerHTML = document.getElementById(`${playerID}hand`).innerHTML + `<img src=${image} />`;
+        const playerDataContinued = database.collection(gameID).doc(`${playerID}data`);
+        playerDataContinued.onSnapshot(playerDataContinuedSnapshot => {
+          const playerHand = playerDataContinuedSnapshot.data()["hand"];
+          const activePlayer = playerDataContinuedSnapshot.data()["activePlayer"];
+          if (activePlayer == true) {
+            this.active = true
+          } else {
+            this.active = false
+          }
+          
+          // var standValue = 0;
+          console.log(`Player hand is ${playerHand}`)
+          playerHand.forEach(function(card) {
+            // console.log(card)
+            console.log(deck[card])
+            this.handValue = deck[card]["blackjack"];
+            // deck[card]["blackjack"];
+          })
+        })
       },
     stand: async function() {
         const eventsData = await database.collection(gameID).doc('events').get()
@@ -133,10 +138,10 @@ export default {
         await database.collection(gameID).doc("events").update({events: events});
         const playerData = await database.collection(gameID).doc(`${playerID}data`).get();
         var playerHand = playerData.data()["hand"];
-        console.log(`Player hand is ${playerHand}`)
+        // console.log(`Player hand is ${playerHand}`)
         var standValue = 0;
         playerHand.forEach(function(card) {
-          console.log(card)
+          // console.log(card)
           standValue = standValue + deck[card]["blackjack"];
         })
         console.log(standValue)
