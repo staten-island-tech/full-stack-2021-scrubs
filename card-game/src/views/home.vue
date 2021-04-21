@@ -58,8 +58,8 @@ html {
   height: 99vh;
   background-image: radial-gradient(
       50% 50% at 50% 50%,
-      rgba(172, 0, 0, 0.87) 0%,
-      rgba(105, 0, 0, 0.87) 100%
+      rgba(#ac0000, 0.87) 0%,
+      rgba(#690000, 0.87) 100%
     ),
     url(../assets/vegasbkgd.jpg);
 }
