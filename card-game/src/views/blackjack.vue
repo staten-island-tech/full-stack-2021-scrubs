@@ -123,7 +123,7 @@ export default {
           
           // var standValue = 0;
           console.log(`Player hand is ${playerHand}`)
-          playerHand.forEach(function(card) {
+          playerHand.forEach((card) => {
             // console.log(card)
             console.log(deck[card])
             this.handValue = deck[card]["blackjack"];
