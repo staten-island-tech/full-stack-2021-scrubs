@@ -18,7 +18,7 @@
     <p class="container-title">It's Not An Addiction Casino</p>
     <transition name="fade">
       <div class="player" v-if="play">
-        <button class="player-button">Create Game</button>
+        <button class="player-button" @click="createRoom()">Create Game</button>
         <button class="player-button" @click="playGame()">Join Game</button>
       </div>
     </transition>
@@ -26,10 +26,13 @@
 </template>
 
 <script>
+import {database} from "@/firebase"
+
 export default {
   data() {
     return {
       play: false,
+      roomCode: "",
     };
   },
   methods: {
@@ -39,6 +42,24 @@ export default {
     auth: function () {
       this.$router.push({ name: "auth" });
     },
+    generateID: function () {
+      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+      for (let i = 1; i < 5; i++){
+        let lastLetter = letters[Math.floor(Math.random() * letters.length)];
+        this.roomCode += `${lastLetter}`;
+      }
+      console.log(this.roomCode);
+    },
+    createRoom: function () {
+      this.generateID();
+      database().ref('blackjack' + this.roomCode).set({
+        deck: [],
+        events: [],
+        player01data: [],
+        player02data: [],
+        players: []
+      });
+    }
   },
 };
 </script>
