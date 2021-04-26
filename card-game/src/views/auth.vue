@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <section class="container">
     <div class="container-inputs">
       <input
         class="username"
@@ -16,9 +16,9 @@
         ref="password"
       />
     </div>
-    <button @click="signIn()">Sign In</button>
-    <button @click="accountCreation()">Create Account</button>
-  </div>
+    <button class="signin" @click="signIn()">Sign In</button>
+    <button class="create" @click="accountCreation()">Create Account</button>
+  </section>
 </template>
 <script>
 import { auth } from "@/firebase";
@@ -76,5 +76,23 @@ export { user };
   border-radius: 5px;
   margin-left: 5px;
   font-size: 2rem;
+}
+
+.signin {
+  color: #ffd600;
+  background: rgba(35, 17, 35, 0.42);
+  border: 1px solid #231123;
+  box-shadow: 0px 4px 17px rgba(152, 73, 0, 0.25);
+  border-radius: 5px;
+  margin-right: 5px;
+}
+
+.create {
+  color: #ffd600;
+  background: rgba(35, 17, 35, 0.42);
+  border: 1px solid #231123;
+  box-shadow: 0px 4px 17px rgba(152, 73, 0, 0.25);
+  border-radius: 5px;
+  margin-left: 5px;
 }
 </style>
