@@ -61,9 +61,11 @@ export default {
         events: []
       }, { merge: true });
       newGame.doc('player01data').set({
+        activePlayer: true,
         hand: []
       }, { merge: true });
       newGame.doc('player02data').set({
+        activePlayer: false,
         hand: []
       }, { merge: true });
       newGame.doc('players').set({

@@ -59,7 +59,6 @@ export default {
           opponentHand.onSnapshot(opponentHandSnapshot => {
           const data = opponentHandSnapshot.data();
           this.opponentHandSize = data["hand"].length;
-          this.shuffleDeck();
         })
         } else {
           const opponentHand = database.collection(gameID).doc("player01data");
