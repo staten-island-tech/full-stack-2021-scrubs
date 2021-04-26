@@ -50,15 +50,26 @@ export default {
       }
       console.log(this.roomCode);
     },
-    createRoom: function () {
+    createRoom: async function () {
+      this.roomCode = "";
       this.generateID();
-      database().ref('blackjack' + this.roomCode).set({
-        deck: [],
-        events: [],
-        player01data: [],
-        player02data: [],
-        players: []
-      });
+      let newGame = database.collection('blackjack' + this.roomCode); 
+      newGame.doc('deck').set({
+        array: []
+      }, { merge: true });
+      newGame.doc('events').set({
+        events: []
+      }, { merge: true });
+      newGame.doc('player01data').set({
+        hand: []
+      }, { merge: true });
+      newGame.doc('player02data').set({
+        hand: []
+      }, { merge: true });
+      newGame.doc('players').set({
+        availableslots: ["player01","player02"],
+        claimedslots: [],
+      }, { merge: true });
     }
   },
 };
