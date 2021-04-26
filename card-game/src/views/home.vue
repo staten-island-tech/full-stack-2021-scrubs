@@ -27,6 +27,7 @@
 
 <script>
 import {database} from "@/firebase"
+import {connecttoGame} from "../views/blackjack"
 
 export default {
   data() {
@@ -53,6 +54,8 @@ export default {
     createRoom: async function () {
       this.roomCode = "";
       this.generateID();
+
+      //this block here actually is the thing that creates the game
       let newGame = database.collection('blackjack' + this.roomCode); 
       newGame.doc('deck').set({
         array: []
@@ -72,6 +75,12 @@ export default {
         availableslots: ["player01","player02"],
         claimedslots: [],
       }, { merge: true });
+
+      //host auto-joins
+      connecttoGame.gameID = "blackjack" + this.roomCode;
+      console.log(connecttoGame.gameID);
+      connecttoGame();
+      this.$router.push({ name: 'blackjack' });
     }
   },
 };

@@ -1,7 +1,6 @@
 <template>
     <div id="container">
       <input type = "text" v-if= "!connected" v-on:input=" gameID = $event.target.value" placeholder="Game ID" ref="gameID"/>
-      <button v-if= "!connected" @click="input()">Input</button>
       <button v-if= "!connected" v-on:click="connecttoGame">Connect to Game</button>
       <button v-if= "connected" v-on:click="shuffleDeck">Shuffle Deck</button>
       <button v-if= "connected && active" v-on:click="hit">Hit</button>
@@ -32,10 +31,9 @@ export default {
     };
   },
   methods: {
-    input: function() {
-        gameID = `blackjack${this.gameID}`
-    },
     connecttoGame: async function() {
+      gameID = `blackjack${this.gameID}`
+
       await database.collection(gameID).doc("events").update({events: []});
       // await database.collection(gameID).doc('players').update({availableslots: ["player01", "player02"]});
       // await database.collection(gameID).doc('players').update({claimedslots: []});
@@ -148,6 +146,9 @@ export default {
     }
     },
 }
+
+export { gameID }
+export function connecttoGame(){}
 </script>
 <style>
 </style>
