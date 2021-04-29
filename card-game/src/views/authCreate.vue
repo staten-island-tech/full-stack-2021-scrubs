@@ -6,7 +6,7 @@
   </div>
 </template>
 <script>
-import {auth} from "@/firebase"
+import {auth, database} from "@/firebase"
 
 export default {
           data() {
@@ -19,7 +19,10 @@ export default {
     createAccount: function() {
         console.log(this.usernameCreate)
         console.log(this.passwordCreate)
-        auth.createUserWithEmailAndPassword(this.usernameCreate, this.passwordCreate)  .then((userCredential) => {
+        auth.createUserWithEmailAndPassword(this.usernameCreate, this.passwordCreate).then((userCredential) => {
+          database.collection("users").doc(userCredential.user.uid).set({
+            currentGame: "none"
+          }).then;
           console.log(userCredential)
           auth.signOut()
           this.$router.push({ name: 'auth' });

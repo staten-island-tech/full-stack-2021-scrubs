@@ -16,7 +16,7 @@
 </template>
 <script>
 import { deck } from "../deck/deck.js"
-import {database} from "@/firebase"
+import {database, auth} from "@/firebase"
 var gameID = "placeholder";
 var playerID = "placeholder";
 const deckcodes = Object.keys(deck)
@@ -29,13 +29,14 @@ export default {
       handValue: 0,
       opponentHandSize: 0,
       eventLog: "",
+      currGame: "",
     };
   },
   methods: {
-    input: function() {
-        gameID = `blackjack${this.gameID}`
-    },
     connecttoGame: async function() {
+      
+      gameID = `blackjack${this.gameID}`;
+
       await database.collection(gameID).doc("events").update({events: []});
       // await database.collection(gameID).doc('players').update({availableslots: ["player01", "player02"]});
       // await database.collection(gameID).doc('players').update({claimedslots: []});
@@ -145,8 +146,29 @@ export default {
           standValue = standValue + deck[card]["blackjack"];
         })
         console.log(standValue)
-    }
     },
+    //this is inefficient! but I am too tired to fix this atm 
+    getData: async function() {
+      const userData = await database.collection("users").doc(auth.currentUser.uid).get()
+      this.currGame = userData.data()["currentGame"];
+
+      if (this.currGame === "none"){
+          gameID = `blackjack${this.gameID}`;
+      }
+      else if (this.currGame !== "none"){
+          gameID = this.currGame;
+          this.connecttoGame();
+      }
+    }
+  },
+  created() {
+      auth.onAuthStateChanged((user) => {
+      console.log(this.gameID);
+      if (user) {
+        this.getData();
+      }
+    });
+  }
 }
 </script>
 <style>

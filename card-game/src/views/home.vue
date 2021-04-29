@@ -11,7 +11,7 @@
       <button class="container-buttons-button">About</button>
       <button class="container-buttons-button">Credits</button>
       <button class="container-buttons-button">Donate</button>
-      <button class="container-buttons-button" @click="auth()">
+      <button class="container-buttons-button" @click="login()">
         Log In | Sign Up
       </button>
     </div>
@@ -26,20 +26,21 @@
 </template>
 
 <script>
-import {database} from "@/firebase"
+import {database, auth} from "@/firebase"
 
 export default {
   data() {
     return {
       play: false,
       roomCode: "",
+      loginStatus: true,
     };
   },
   methods: {
     playGame: function () {
       this.$router.push({ name: "blackjack" });
     },
-    auth: function () {
+    login: function () {
       this.$router.push({ name: "auth" });
     },
     generateID: function () {
@@ -51,30 +52,53 @@ export default {
       console.log(this.roomCode);
     },
     createRoom: async function () {
-      this.roomCode = "";
-      this.generateID();
-      let newGame = database.collection('blackjack' + this.roomCode); 
-      newGame.doc('deck').set({
-        array: []
-      }, { merge: true });
-      newGame.doc('events').set({
-        events: []
-      }, { merge: true });
-      newGame.doc('player01data').set({
-        activePlayer: true,
-        hand: []
-      }, { merge: true });
-      newGame.doc('player02data').set({
-        activePlayer: false,
-        hand: []
-      }, { merge: true });
-      newGame.doc('players').set({
-        availableslots: ["player01","player02"],
-        claimedslots: [],
-      }, { merge: true });
-    }
+      if (this.loginStatus === true){
+        this.roomCode = "";
+        this.generateID();
+        let newGame = database.collection('blackjack' + this.roomCode); 
+        newGame.doc('deck').set({
+          array: []
+        }, { merge: true });
+        newGame.doc('events').set({
+          events: []
+        }, { merge: true });
+        newGame.doc('player01data').set({
+          activePlayer: true,
+          hand: []
+        }, { merge: true });
+        newGame.doc('player02data').set({
+          activePlayer: false,
+          hand: []
+        }, { merge: true });
+        newGame.doc('players').set({
+          availableslots: ["player01","player02"],
+          claimedslots: [],
+        }, { merge: true });
+
+        console.log(auth.currentUser.uid);
+        database.collection("users").doc(auth.currentUser.uid).update({
+          currentGame: `blackjack${this.roomCode}`
+        })
+        this.$router.push({ name: "blackjack" });
+      }
+      else{
+        alert("Login to create game");
+      }
+    },
   },
-};
+  created() {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.loginStatus = true;
+        console.log(this.loginStatus);
+      } else {
+        this.loginStatus = false;
+        console.log(this.loginStatus);
+      }
+    });
+  }
+}
+
 </script>
 <style lang="scss">
 html {
