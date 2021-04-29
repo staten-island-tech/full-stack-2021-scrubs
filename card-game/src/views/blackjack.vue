@@ -30,12 +30,14 @@ export default {
       opponentHandSize: 0,
       eventLog: "",
       currGame: "",
+      loginStatus: false,
     };
   },
   methods: {
     connecttoGame: async function() {
-      
-      gameID = `blackjack${this.gameID}`;
+      if (this.loginStatus === false){
+        gameID = `blackjack${this.gameID}`;
+      }
 
       await database.collection(gameID).doc("events").update({events: []});
       // await database.collection(gameID).doc('players').update({availableslots: ["player01", "player02"]});
@@ -163,9 +165,11 @@ export default {
   },
   created() {
       auth.onAuthStateChanged((user) => {
-      console.log(this.gameID);
       if (user) {
+        this.loginStatus = true;
         this.getData();
+      } else {
+        this.loginStatus = false;
       }
     });
   }
