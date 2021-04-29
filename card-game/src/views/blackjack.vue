@@ -147,28 +147,6 @@ export default {
         const image = deck[playerHand[playerHand.length-1]]["image"]; 
         // console.log(image)
         document.getElementById(`${playerID}hand`).innerHTML = document.getElementById(`${playerID}hand`).innerHTML + `<img src=${image} />`;
-<<<<<<< HEAD
-=======
-        const playerDataContinued = database.collection(gameID).doc(`${playerID}data`);
-        playerDataContinued.onSnapshot(playerDataContinuedSnapshot => {
-          const playerHand = playerDataContinuedSnapshot.data()["hand"];
-          const activePlayer = playerDataContinuedSnapshot.data()["activePlayer"];
-          if (activePlayer == true) {
-            this.active = true
-          } else {
-            this.active = false
-          }
-          
-          // var standValue = 0;
-          console.log(`Player hand is ${playerHand}`)
-          playerHand.forEach((card) => {
-            // console.log(card)
-            console.log(deck[card])
-            this.handValue = deck[card]["blackjack"];
-            // deck[card]["blackjack"];
-          })
-        })
->>>>>>> 82cc7d458628917415569e74f28e2a2832af99a5
       },
     stand: async function() {
         const eventsData = await database.collection(gameID).doc('events').get()
