@@ -5,8 +5,8 @@
       <button v-if= "!connected && !pending" v-on:click="connecttoGame">Connect to Game</button>
       <!-- Shuffle functionality is obsolete -->
       <!-- <button v-if= "connected && active" v-on:click="shuffleDeck">Shuffle Deck</button> -->
-      <button v-if= "connected && active && !standing" v-on:click="hit">Hit</button>
-      <button v-if= "connected && active && !standing" v-on:click="stand">Stand</button>
+      <button v-if= "connected && active && !standing && !gameOver" v-on:click="hit">Hit</button>
+      <button v-if= "connected && active && !standing && !gameOver" v-on:click="stand">Stand</button>
       <button v-if= "gameOver" v-on:click="restart">Play again</button>
       <div v-if= "pending">Waiting for more players to connect</div>
       <div v-if= "connected && !gameOver">Deck size is: {{deckSize}}</div>
@@ -15,8 +15,8 @@
       <div v-if= "connected && !gameOver">Opponent hand size is: {{opponentHandSize}}</div>
       <div v-if= "connected && !gameOver">Event log: {{eventLog}}</div>
       <div v-if= "gameOver">{{result}}</div>
-      <div v-if= "connected && !gameOver" id="player01hand"></div>
-      <div v-if= "connected && !gameOver" id="player02hand"></div>
+      <div v-if= "connected" id="player01hand"></div>
+      <div v-if= "connected" id="player02hand"></div>
     </div>
 </template>
 <script>
@@ -97,12 +97,32 @@ export default {
     playerHand.forEach(function(card) {
       playerHandValue = playerHandValue + deck[card]["blackjack"];
     })
+    if (playerHandValue > 21) {
+      playerHandValue = 0;
+      playerHand.forEach(function(card) {
+        if (deck[card]["value"] == "ACE") {
+          playerHandValue = playerHandValue + 1;
+        } else {
+          playerHandValue = playerHandValue + deck[card]["blackjack"];
+        }
+    })
+    }
     const opponentData = await database.collection(gameID).doc(`${opponentID}data`).get();
     var opponentHand = opponentData.data()["hand"];
     var opponentHandValue = 0
     opponentHand.forEach(function(card) {
       opponentHandValue = opponentHandValue + deck[card]["blackjack"];
     })
+    if (opponentHandValue > 21) {
+      opponentHandValue = 0;
+      opponentHand.forEach(function(card) {
+        if (deck[card]["value"] == "ACE") {
+          opponentHandValue = opponentHandValue + 1;
+        } else {
+          opponentHandValue = opponentHandValue + deck[card]["blackjack"];
+        }
+    })
+    }
 
     const players = await database.collection(gameID).doc("players").get();
     var standingPlayers = players.data()["standingplayers"]
@@ -189,10 +209,19 @@ export default {
           const playerHand = playerDataSnapshot.data()["hand"];
           let vm = this
           if (playerHand.length !== 0) {
-            vm.handValue = 0;
+            vm.handValue = 0; 
             playerHand.forEach(function(card) {
               vm.handValue = vm.handValue + deck[card]["blackjack"];
             })
+            if (vm.handValue > 21) {
+              vm.handValue = 0;
+              playerHand.forEach(function(card) {
+              if (deck[card]["value"] == "ACE") {
+                vm.handValue = vm.handValue + 1;
+              } else {
+                vm.handValue = vm.handValue + deck[card]["blackjack"];
+              }})
+            }
           }
           if (vm.handValue > 21) {
             this.standing = true;
@@ -269,9 +298,9 @@ export default {
         await database.collection(gameID).doc(`${playerID}data`).update({hand: playerHand});
         const image = deck[playerHand[playerHand.length-1]]["image"]; 
         // console.log(image)
-        if (this.gameOver == false) {
-          document.getElementById(`${playerID}hand`).innerHTML = document.getElementById(`${playerID}hand`).innerHTML + `<img src=${image} />`;
-        }
+        // if (this.gameOver == false) {
+        document.getElementById(`${playerID}hand`).innerHTML = document.getElementById(`${playerID}hand`).innerHTML + `<img src=${image} />`;
+        // }
       },
     stand: async function() {
         this.standing = true;
