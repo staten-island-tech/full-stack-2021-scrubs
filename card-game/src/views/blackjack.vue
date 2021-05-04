@@ -278,8 +278,7 @@ export default {
         var players = await database.collection(gameID).doc('players').get();
         var standingPlayers = players.data()["standingplayers"];
         if (standingPlayers.indexOf(opponentID) == -1) {
-          console.log(`standingPlayers is ${standingPlayers} and opponentID is ${opponentID}`)
-          await database.collection(gameID).doc("players").update({nonactiveplayer: playerID});
+          console.log(`standingPlayers is ${standingPlayers} and opponentID is ${opponentID}`);
         }
         const eventsData = await database.collection(gameID).doc('events').get()
         var events = eventsData.data()["events"];
