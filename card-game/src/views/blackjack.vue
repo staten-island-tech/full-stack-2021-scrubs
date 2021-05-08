@@ -13,15 +13,16 @@
       <div v-if= "connected && !gameOver">Opponent hand size is: {{opponentHandSize}}</div>
       <div v-if= "connected && !gameOver">Event log: {{eventLog}}</div>
       <div v-if= "gameOver">{{result}}</div>
-      <div v-if= "connected" id="player01hand"></div>
-      <div v-if= "connected" id="player02hand"></div>
+      <div v-show= "connected" id="yourHand"></div>
+      <div v-show= "connected" id="theirHand"></div>
   </div>
 </template>
 <script>
 // platonicDeck is a static deck objects that contains various references for cards
-
 import {platonicDeck} from "../deck/deck.js"
-const deckCodes = Object.keys(platonicDeck)
+// Shifting to remove first element of platonic deck which is a card back
+const deckCodes = Object.keys(platonicDeck);
+deckCodes.shift()
 // database is the Firestore database we will be interfacing with
 import {database} from "@/firebase"
 var gameID;
@@ -62,7 +63,6 @@ export default {
             await database.collection(gameID).doc("players").update({activeplayer: "player01"});
             await database.collection(gameID).doc("events").update({events: []});
         }
-        // Temp for ease of reset while testing ends here
         // Simulates deck being shuffled and pushes shuffled deck object to database
         for (let i = deckCodes.length - 1; i > -1; i--) {
             let j = Math.floor(Math.random() * (i + 1));
@@ -84,6 +84,9 @@ export default {
             } else if (playerID == "player02") {
                 opponentID = "player01";
             }
+            // Toggle the ids of the two card display divs to ensure that your hand will be displayed above your opponents hand
+            document.getElementById("yourHand").setAttribute("id", `${playerID}hand`);
+            document.getElementById("theirHand").setAttribute("id", `${opponentID}hand`);
             // Updates availableSlots and claimedSlots field in database to reflect the fact that a player connected
             claimedSlots.push(playerID)
             availableSlots.splice(0,1);
@@ -98,11 +101,13 @@ export default {
             // Establishes live snapshot to opponents data and specifically hand
             const opponentData = database.collection(gameID).doc(`${opponentID}data`);
             opponentData.onSnapshot(opponentDataSnapshot => {
-                const data = opponentDataSnapshot.data();
-                console.log(`gameID is ${gameID}`)
-                console.log(`opponentID is ${opponentID}`)
-                console.log(`dats is: ${data}`)
-                this.opponentHandSize = data["hand"].length;
+                const opponentHand = opponentDataSnapshot.data()["hand"];
+                if (opponentHand.length > 1) {
+                    // Displays image for latest card added to your opponents hand
+                    const image = platonicDeck[opponentHand[opponentHand.length-1]]["image"]; 
+                    document.getElementById(`${opponentID}hand`).innerHTML = document.getElementById(`${opponentID}hand`).innerHTML + `<img src=${image} />`;
+                }
+                this.opponentHandSize = opponentHand.length;
             })
             // Establishes live snapshot to event feed
             const events = database.collection(gameID).doc("events");
@@ -154,6 +159,18 @@ export default {
                 // If both players are connected start the game
                 var claimedSlots = playersDocumentSnapshot.data()["claimedslots"]
                 if (claimedSlots.length == 2) {
+                    // Perform required setup after both players have connected one time
+                    if (this.connected == false) {
+                        // Displays card backs to represent opponents unknown cards
+                        var cardBack  = platonicDeck["cardBack"]["image"];
+                        console.log(opponentID)
+                        console.log(document.getElementById(`${opponentID}hand`))
+                        document.getElementById(`${opponentID}hand`).innerHTML = document.getElementById(`${opponentID}hand`).innerHTML + `<img src=${cardBack} />`;
+                        // Draw your initial cards and prevent issues that arise from multiple users making the same request at once
+                        if (playerID == "player01") {
+                            this.hit();
+                        }
+                    }
                     this.connected = true;
                     this.pending = false;
                 }
@@ -172,17 +189,20 @@ export default {
     },
     // This function establishes the logic for a player taking the hit action
     hit: async function() {
-        // Passes status as active to other player after taking an action
-        var playersDocument = await database.collection(gameID).doc('players').get();
-        var standingPlayers = playersDocument.data()["standingplayers"];
-        if (standingPlayers.indexOf(opponentID) == -1) {
-            await database.collection(gameID).doc("players").update({activeplayer: opponentID});
+        // This distinction is made to faciliate the call of this function in a slighly different capacity during setup
+        if (this.connected == true) {
+            // Passes status as active to other player after taking an action
+            var playersDocument = await database.collection(gameID).doc('players').get();
+            var standingPlayers = playersDocument.data()["standingplayers"];
+            if (standingPlayers.indexOf(opponentID) == -1) {
+                await database.collection(gameID).doc("players").update({activeplayer: opponentID});
+            }
+            // Updates event feed to reflect the fact that a player took a hit
+            const eventsData = await database.collection(gameID).doc('events').get()
+            var events = eventsData.data()["events"];
+            events.push(`${playerID} hit`)
+            await database.collection(gameID).doc("events").update({events: events});
         }
-        // Updates event feed to reflect the fact that a player took a hit
-        const eventsData = await database.collection(gameID).doc('events').get()
-        var events = eventsData.data()["events"];
-        events.push(`${playerID} hit`)
-        await database.collection(gameID).doc("events").update({events: events});
         // Updates deck object and player hand in database to reflect the fact that a player took a hit
         const databaseDeck = await database.collection(gameID).doc("deck").get();
         const data = databaseDeck.data();

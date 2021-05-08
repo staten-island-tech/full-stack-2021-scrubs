@@ -1,4 +1,8 @@
 const platonicDeck = {
+  cardBack: {
+    code: "cardBack",
+    image: require("@/deck/images/CardBack.png"),
+  },
   SA: {
     code: "AS",
     image: require("@/deck/images/AS.png"),
