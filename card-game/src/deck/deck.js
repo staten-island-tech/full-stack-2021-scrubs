@@ -1,4 +1,4 @@
-const deck = {
+const platonicDeck = {
   SA: {
     code: "AS",
     image: require("@/deck/images/AS.png"),
@@ -364,4 +364,4 @@ const deck = {
     suit: "HEARTS",
   },
 };
-export { deck };
+export { platonicDeck };
