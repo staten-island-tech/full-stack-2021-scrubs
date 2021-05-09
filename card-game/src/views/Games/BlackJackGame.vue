@@ -1,16 +1,14 @@
 <template>
   <div>
     <button id="leave">
-      <router-link to="/BlackJackLobby">Leave</router-link>
+      <router-link to="Games">Leave</router-link>
     </button>
     <div v-if="!serverSided.gameStarted" class="game-interface">
-      <hr />
-      {{ serverSided.lobbyName }}
-      <hr />
+      <div>Code: {{ serverSided.code }}</div>
       <p v-for="(player, index) in serverSided.players" :key="index">
         {{ player.name }}
       </p>
-      <button v-if="!serverSided.disableStart" @click="deal">Start</button>
+      <button v-if="!serverSided.disableStart" @click="start">Start</button>
       <p v-if="serverSided.disableStart">Waiting for game to load...</p>
     </div>
     <div v-if="serverSided.gameStarted">
@@ -46,55 +44,62 @@
 </template>
 
 <script>
-import { deck } from '../../deck/deck.js';
-import { db } from './firebase.js';
+import { deck } from "../../deck/deck.js";
+import { database } from "../../firebase.js";
 
-let dataBase = db.collection('game').doc('GOK7vK6j4yW23QRdRPv2');
+let dataBase = database.collection("games").doc("GOK7vK6j4yW23QRdRPv2");
 export default {
-  name: 'Game',
+  name: "Game",
   data() {
     return {
       serverSided: {
+        code: "",
         disableStart: false,
         deck: deck,
         deckV: [],
-        lobbyName: 'Lobby1',
+        lobbyName: "Lobby1",
         players: [
           {
             player: true,
             cardScore: 0,
             hand: [],
-            name: 'Player 1',
+            name: "Player 1",
             canHit: false,
             blackJack: false,
             busted: false,
             turnOrder: null,
             played: false,
             stand: false,
-            result: '',
+            result: ""
           },
           {
             player: true,
             cardScore: 0,
             hand: [],
-            name: 'Player 2',
+            name: "Player 2",
             canHit: false,
             blackJack: false,
             busted: false,
             turnOrder: null,
             played: false,
             stand: false,
-            result: '',
-          },
+            result: ""
+          }
         ],
         gameStarted: false,
-        finished: false,
-        fireStoreID: '',
+        finished: false
       },
-      lobby: '../../views/Lobbies/BlackJackLobby.vue',
+      lobby: "../../views/Lobbies/BlackJackLobby.vue"
     };
   },
+  props: {
+    gameCode: String
+  },
   methods: {
+    start() {
+      this.serverSided.disableStart = true;
+      this.serverSided.gameStarted = true;
+    },
     randomDeck() {
       return Math.floor(Math.random() * this.serverSided.deckV.length);
     },
@@ -102,7 +107,7 @@ export default {
       let vm = this;
       this.serverSided.disableStart = true;
       await vm.reset();
-      await dataBase.get().then((snapshot) => {
+      await dataBase.get().then(snapshot => {
         let firestoreConsole = snapshot.data();
         vm.serverSided.players = firestoreConsole.players;
         vm.serverSided.deckV = firestoreConsole.deck;
@@ -116,8 +121,8 @@ export default {
             let remove = vm.serverSided.deckV.indexOf(hands.hand[last]);
             vm.serverSided.deckV.splice(remove, 1);
           }
-          hands.hand.forEach((card) => {
-            if (card.value == 'ACE') {
+          hands.hand.forEach(card => {
+            if (card.value == "ACE") {
               card.blackjack = 11;
             }
             hands.cardScore += card.blackjack;
@@ -129,9 +134,9 @@ export default {
       await dataBase.update({
         deckV: vm.serverSided.deckV,
         players: vm.serverSided.players,
-        gameStarted: true,
+        gameStarted: true
       });
-      await dataBase.get().then((snapshot) => {
+      await dataBase.get().then(snapshot => {
         let firestoreConsole = snapshot.data();
         vm.serverSided.gameStarted = firestoreConsole.gameStarted;
       });
@@ -141,7 +146,7 @@ export default {
       serverSided.deckV = [];
       serverSided.finished = false;
       serverSided.gameStarted = false;
-      serverSided.players.forEach((player) => {
+      serverSided.players.forEach(player => {
         player.cardScore = 0;
         player.hand = [];
         player.canHit = false;
@@ -150,17 +155,17 @@ export default {
         player.turnOrder = null;
         player.played = false;
         player.stand = false;
-        player.result = '';
+        player.result = "";
       });
       await dataBase
         .update({
           deckV: serverSided.deckV,
           finished: serverSided.finished,
           gameStarted: serverSided.gameStarted,
-          players: serverSided.players,
+          players: serverSided.players
         })
-        .catch((err) => {
-          console.log('error lol');
+        .catch(err => {
+          console.log("error lol");
           console.log(err);
         });
     },
@@ -172,8 +177,8 @@ export default {
       this.serverSided.deckV.splice(remove, 1);
       playerHand.cardScore +=
         playerHand.hand[playerHand.hand.length - 1].blackjack;
-      playerHand.hand.forEach((card) => {
-        if (card.value === 'ACE') {
+      playerHand.hand.forEach(card => {
+        if (card.value === "ACE") {
           if (playerHand.cardScore >= 21 && card.blackjack != 1) {
             playerHand.cardScore -= card.blackjack;
             card.blackjack = 1;
@@ -203,7 +208,7 @@ export default {
         playerStats.played = true;
       }
       if (playerStats.played === true) {
-        this.serverSided.players.forEach((player) => {
+        this.serverSided.players.forEach(player => {
           player.turnOrder -= 1;
           if (player.turnOrder <= 0) {
             player.turnOrder = this.serverSided.players.length;
@@ -221,17 +226,17 @@ export default {
       }
       await dataBase.update({
         players: this.serverSided.players,
-        finished: this.serverSided.finished,
+        finished: this.serverSided.finished
       });
       await dataBase
         .get()
-        .then((snapshot) => {
+        .then(snapshot => {
           let firestoreConsole = snapshot.data();
           this.serverSided.players = firestoreConsole.players;
           this.serverSided.finished = firestoreConsole.finished;
         })
-        .catch((err) => {
-          console.log('error lul');
+        .catch(err => {
+          console.log("error lul");
           console.log(err);
         });
     },
@@ -241,7 +246,7 @@ export default {
       for (let i = 1; i <= players; i++) {
         order.push(i);
       }
-      this.serverSided.players.forEach((player) => {
+      this.serverSided.players.forEach(player => {
         let random = Math.floor(Math.random() * order.length);
         player.turnOrder = order[random];
         order.splice(random, 1);
@@ -249,8 +254,11 @@ export default {
           player.canHit = true;
         }
       });
-    },
+    }
   },
+  mounted() {
+    this.serverSided.code = this.$route.params.data.code;
+  }
 };
 </script>
 

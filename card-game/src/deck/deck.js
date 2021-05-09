@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 const deck = [{
         code: "AS",
         image: require("@/deck/images/AS.png"),

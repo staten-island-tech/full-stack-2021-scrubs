@@ -1,6 +1,12 @@
 <template>
   <div>
-    <Lobby :gameType="game" />
+    <Lobby
+      v-if="!roomCreated"
+      :game="game"
+      :gameType="gameType"
+      @code="gameCode = $event"
+      @created="roomCreated = $event"
+    />
   </div>
 </template>
 
@@ -13,9 +19,13 @@ export default {
   },
   data() {
     return {
-      game: "/BlackJackGame"
+      game: "BlackJack Lobby",
+      gameCode: "",
+      gameType: "BlackJackGame",
+      roomCreated: false
     };
-  }
+  },
+  methods: {}
 };
 </script>
 

@@ -1,9 +1,11 @@
+/* eslint-disable prettier/prettier */
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/UserInterface/Home.vue";
 
 Vue.use(VueRouter);
 
+// eslint-disable-next-line prettier/prettier
 const routes = [{
     path: "/",
     name: "Home",
@@ -59,8 +61,8 @@ const routes = [{
   {
     path: "/BlackJackGame",
     name: "BlackJackGame",
-
-    component: () => import("../views/Games/BlackJackGame.vue")
+    component: () => import("../views/Games/BlackJackGame.vue"),
+    props: true,
   }
 ];
 
