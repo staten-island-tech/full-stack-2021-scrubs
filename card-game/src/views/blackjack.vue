@@ -29,6 +29,15 @@ var gameID;
 var playerID;
 var opponentID;
 
+// This function establishes the procedure for both players starting the game with two cards. It is only run by one of the players which is ensured locally
+async function initialDrawTwo() {
+    const databaseDeck = await database.collection(gameID).doc("deck").get();
+    const deck = databaseDeck.data()["array"];
+    await database.collection(gameID).doc(`${playerID}data`).update({hand: deck.slice(0, 2)});
+    await database.collection(gameID).doc(`${opponentID}data`).update({hand: deck.slice(2, 4)});
+    await database.collection(gameID).doc("deck").update({array: deck.slice(4)});
+}
+
 export default {
   data() {
     return {
@@ -102,10 +111,14 @@ export default {
             const opponentData = database.collection(gameID).doc(`${opponentID}data`);
             opponentData.onSnapshot(opponentDataSnapshot => {
                 const opponentHand = opponentDataSnapshot.data()["hand"];
-                if (opponentHand.length > 1) {
-                    // Displays image for latest card added to your opponents hand
-                    const image = platonicDeck[opponentHand[opponentHand.length-1]]["image"]; 
-                    document.getElementById(`${opponentID}hand`).innerHTML = document.getElementById(`${opponentID}hand`).innerHTML + `<img src=${image} />`;
+                // Displays images for all cards in your opponents hand, representing the first as a card back
+                if (opponentHand.length !== 0) {
+                    document.getElementById(`${opponentID}hand`).innerHTML = `<img src=${platonicDeck["cardBack"]["image"]} />`
+                    opponentHand.slice(1).forEach(function(card) {
+                        const image = platonicDeck[card]["image"]; 
+                        document.getElementById(`${opponentID}hand`).innerHTML = document.getElementById(`${opponentID}hand`).innerHTML + `<img src=${image} />`;
+                    })
+                    console.log("the opponents displayed hand is being updated")
                 }
                 this.opponentHandSize = opponentHand.length;
             })
@@ -122,10 +135,12 @@ export default {
                 let vm = this
                 if (playerHand.length !== 0) {
                     // Displays image for latest card added to your hand
-                    const image = platonicDeck[playerHand[playerHand.length-1]]["image"]; 
-                    document.getElementById(`${playerID}hand`).innerHTML = document.getElementById(`${playerID}hand`).innerHTML + `<img src=${image} />`;
+                    console.log(`your displayed hand is being updated and the snapshot is: ${playerDataSnapshot}`) 
                     vm.handValue = 0; 
+                    document.getElementById(`${playerID}hand`).innerHTML = "";
                     playerHand.forEach(function(card) {
+                        const image = platonicDeck[card]["image"];
+                        document.getElementById(`${playerID}hand`).innerHTML = document.getElementById(`${playerID}hand`).innerHTML + `<img src=${image} />`;
                         vm.handValue = vm.handValue + platonicDeck[card]["blackjack"];
                     })
                     // In the case that card value exceeds 21 this flips the value of aces to 1 instead of 11
@@ -140,9 +155,11 @@ export default {
                     }
                     // If after this transmutation card value continues to exceed 21 the player busts and the game ends
                     if (vm.handValue > 21) {
-                        this.standing = true;
-                        vm.gameEnd()
-                        vm.gameOver = true;
+                        this.stand();
+                        // This code is only neccesary if you want a player to automatically lose if they bust
+                        // this.standing = true;
+                        // vm.gameEnd()
+                        // vm.gameOver = true;
                     }
                 }
             })
@@ -168,7 +185,7 @@ export default {
                         document.getElementById(`${opponentID}hand`).innerHTML = document.getElementById(`${opponentID}hand`).innerHTML + `<img src=${cardBack} />`;
                         // Draw your initial cards and prevent issues that arise from multiple users making the same request at once
                         if (playerID == "player01") {
-                            this.hit();
+                            initialDrawTwo();
                         }
                     }
                     this.connected = true;
@@ -189,20 +206,18 @@ export default {
     },
     // This function establishes the logic for a player taking the hit action
     hit: async function() {
-        // This distinction is made to faciliate the call of this function in a slighly different capacity during setup
-        if (this.connected == true) {
-            // Passes status as active to other player after taking an action
-            var playersDocument = await database.collection(gameID).doc('players').get();
-            var standingPlayers = playersDocument.data()["standingplayers"];
-            if (standingPlayers.indexOf(opponentID) == -1) {
-                await database.collection(gameID).doc("players").update({activeplayer: opponentID});
-            }
-            // Updates event feed to reflect the fact that a player took a hit
-            const eventsData = await database.collection(gameID).doc('events').get()
-            var events = eventsData.data()["events"];
-            events.push(`${playerID} hit`)
-            await database.collection(gameID).doc("events").update({events: events});
-        }
+        // This code is only neccesary if you want players to take turns hitting
+        // Passes status as active to other player after taking an action
+        // var playersDocument = await database.collection(gameID).doc('players').get();
+        // var standingPlayers = playersDocument.data()["standingplayers"];
+        // if (standingPlayers.indexOf(opponentID) == -1) {
+        //     await database.collection(gameID).doc("players").update({activeplayer: opponentID});
+        // }
+        // Updates event feed to reflect the fact that a player took a hit
+        const eventsData = await database.collection(gameID).doc('events').get()
+        var events = eventsData.data()["events"];
+        events.push(`${playerID} hit`)
+        await database.collection(gameID).doc("events").update({events: events});
         // Updates deck object and player hand in database to reflect the fact that a player took a hit
         const databaseDeck = await database.collection(gameID).doc("deck").get();
         const data = databaseDeck.data();
@@ -267,14 +282,17 @@ export default {
                 }
             })
         }
+        // This code is only neccesary if you want a player to automatically lose if they bust
         // Normalize data between two players by ensuring that both are labeled as standing if only one is
-        const playersDocument = await database.collection(gameID).doc("players").get();
-        var standingPlayers = playersDocument.data()["standingplayers"]
-        if (playerHandValue > 21 && standingPlayers.length !== 2) {
-            await database.collection(gameID).doc("players").update({standingplayers: ["player01", "player02"]});
-        }
+        // const playersDocument = await database.collection(gameID).doc("players").get();
+        // var standingPlayers = playersDocument.data()["standingplayers"]
+        // if (playerHandValue > 21 && standingPlayers.length !== 2) {
+        //     await database.collection(gameID).doc("players").update({standingplayers: ["player01", "player02"]});
+        // }
         // Compare relative numerical values of hands to determine game result
-        if (playerHandValue > 21) {
+        if (playerHandValue > 21 && opponentHandValue > 21) {
+            this.result = "Both players busted. It's a tie.";
+        } else if (playerHandValue > 21) {
             this.result = `${opponentID} has won.`;
         } else if (opponentHandValue > 21) {
             this.result =  `${playerID} has won.`;
@@ -304,10 +322,14 @@ export default {
         await database.collection(gameID).doc('player01data').update({hand: []});
         await database.collection(gameID).doc('player02data').update({hand: []});
         await database.collection(gameID).doc("players").update({standingplayers: []});
-        await database.collection(gameID).doc("players").update({nonactiveplayer: "player02"});
+        await database.collection(gameID).doc("players").update({activeplayer: "player01"});
         await database.collection(gameID).doc("events").update({events: []});
         document.getElementById(`${playerID}hand`).innerHTML = "";
         document.getElementById(`${opponentID}hand`).innerHTML = "";
+        // Draw your initial cards and prevent issues that arise from multiple users making the same request at once
+        if (playerID == "player01") {
+            initialDrawTwo();
+        }
     },
     },
 }
