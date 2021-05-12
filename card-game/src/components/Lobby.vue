@@ -2,11 +2,22 @@
   <div>
     <router-link id="games" to="/Games">Back</router-link>
     <div>{{ gameType }}</div>
+    <br />
     <div class="player" v-if="play">
+      <form>
+        Please enter a name:
+        <input
+          type="text"
+          placeholder="Put In Your Name"
+          v-model="playerStatus.name"
+        />
+      </form>
+      <br />
       <button class="player-button" @click="createRoom">Create Game</button>
       <br />
       <p>or</p>
       <form>
+        <br />
         <input
           type="text"
           placeholder="Put in the 4 digit code"
@@ -26,9 +37,13 @@ export default {
   name: "Lobby",
   data() {
     return {
+      playerStatus: {
+        master: "",
+        name: ""
+      },
       play: true,
       roomCode: "",
-      loginStatus: true,
+      // loginStatus: true,
       joinCode: ""
     };
   },
@@ -37,7 +52,7 @@ export default {
     gameType: String
   },
   methods: {
-    generateID: function() {
+    generateID() {
       const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
       for (let i = 1; i < 5; i++) {
         let lastLetter = letters[Math.floor(Math.random() * letters.length)];
@@ -46,39 +61,39 @@ export default {
       console.log(this.roomCode);
       this.$emit("code", this.roomCode);
     },
-    createRoom: async function() {
-      if (this.loginStatus === true) {
-        this.roomCode = "";
+    async createRoom() {
+      if (this.playerStatus.name.length > 0) {
         this.generateID();
         let newGame = database
           .collection("games")
-          .doc("blackjack" + this.roomCode)
-          .set({
-            deck: deck,
+          .doc("blackjack" + this.roomCode);
+        this.playerStatus.master = true;
+        newGame.set(
+          {
             events: [],
             gamePlayers: [],
-            lobbyPlayers: []
-          });
+            lobby: {
+              slots: 1,
+              lobbyPlayers: [this.playerStatus]
+            },
+            deck: deck
+          },
+          {
+            merge: true
+          }
+        );
         let data = {
-          code: this.roomCode
+          code: this.roomCode,
+          name: this.playerStatus.name,
+          master: this.playerStatus.master
         };
         this.$router.push({ name: this.gameType, params: { data } });
-        database
-          .collection("games")
-          .get()
-          .then(snapshot => {
-            console.log(snapshot);
-            console.log(newGame);
-          });
-        this.$emit("created", true);
       } else {
-        alert("Login to create game");
+        alert("Enter A Name!");
       }
     },
     async joinGame() {
-      console.log(this.joinCode);
       if (this.joinCode.length == 4) {
-        console.log("Checking if it exists");
         let codeExists = await database
           .collection("games")
           .doc(`blackjack${this.joinCode}`)
@@ -86,12 +101,45 @@ export default {
           .then(snapshot => {
             return snapshot.exists;
           });
-        console.log(codeExists);
         if (codeExists === true) {
-          let data = {
-            code: this.joinCode
-          };
-          this.$router.push({ name: this.gameType, params: { data } });
+          let lobby = database
+            .collection("games")
+            .doc(`blackjack${this.joinCode}`);
+          let slot = await lobby.get().then(snapshot => {
+            return snapshot.data().lobby.slots;
+          });
+          if (slot !== 0) {
+            let playerData;
+            await lobby.get().then(doc => {
+              for (let i = 0; i < doc.data().lobby.lobbyPlayers.length; i++) {
+                playerData = doc.data().lobby.lobbyPlayers;
+              }
+            });
+            this.playerStatus.master = false;
+            playerData.push({
+              master: this.playerStatus.master,
+              name: this.playerStatus.name
+            });
+            await lobby.set(
+              {
+                lobby: {
+                  lobbyPlayers: playerData,
+                  slots: slot - 1
+                }
+              },
+              {
+                merge: true
+              }
+            );
+            let data = {
+              code: this.joinCode,
+              name: this.playerStatus.name,
+              master: this.playerStatus.master
+            };
+            this.$router.push({ name: this.gameType, params: { data } });
+          } else {
+            alert(`Room is full!`);
+          }
         } else {
           alert("Code does not exist, please input another one");
         }
