@@ -3,8 +3,8 @@ import VueRouter from "vue-router";
 import auth from "../views/auth.vue";
 import authCreate from "../views/authCreate.vue";
 import signedIn from "../views/signedIn.vue";
-import board from "../views/board.vue";
 import blackjack from "../views/blackjack.vue";
+import blackjacklobby from "../views/blackjacklobby.vue";
 import home from "../views/home.vue";
 
 Vue.use(VueRouter);
@@ -22,8 +22,8 @@ const routes = [
   },
   {
     path: "/",
-    name: "board",
-    component: board,
+    name: "blackjacklobby",
+    component: blackjacklobby,
   },
   {
     path: "/",

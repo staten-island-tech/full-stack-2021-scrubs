@@ -5,9 +5,7 @@
       href="https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap"
     />
     <div class="container-buttons">
-      <button class="container-buttons-button" v-on:click="play = !play">
-        Play
-      </button>
+      <button class="container-buttons-button" @click="playGame()">Play</button>
       <button class="container-buttons-button">About</button>
       <button class="container-buttons-button">Credits</button>
       <button class="container-buttons-button">Donate</button>
@@ -16,17 +14,11 @@
       </button>
     </div>
     <p class="container-title">It's Not An Addiction Casino</p>
-    <transition name="fade">
-      <div class="player" v-if="play">
-        <button class="player-button" @click="createRoom()">Create Game</button>
-        <button class="player-button" @click="playGame()">Join Game</button>
-      </div>
-    </transition>
   </div>
 </template>
 
 <script>
-import {database, auth} from "@/firebase"
+import { auth} from "@/firebase"
 
 export default {
   data() {
@@ -38,52 +30,7 @@ export default {
   },
   methods: {
     playGame: function () {
-      this.$router.push({ name: "blackjack" });
-    },
-    login: function () {
-      this.$router.push({ name: "auth" });
-    },
-    generateID: function () {
-      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-      for (let i = 1; i < 5; i++){
-        let lastLetter = letters[Math.floor(Math.random() * letters.length)];
-        this.roomCode += `${lastLetter}`;
-      }
-      console.log(this.roomCode);
-    },
-    createRoom: async function () {
-      if (this.loginStatus === true){
-        this.roomCode = "";
-        this.generateID();
-        let newGame = database.collection('blackjack' + this.roomCode); 
-        newGame.doc('deck').set({
-          array: []
-        }, { merge: true });
-        newGame.doc('events').set({
-          events: []
-        }, { merge: true });
-        newGame.doc('player01data').set({
-          activePlayer: true,
-          hand: []
-        }, { merge: true });
-        newGame.doc('player02data').set({
-          activePlayer: false,
-          hand: []
-        }, { merge: true });
-        newGame.doc('players').set({
-          availableslots: ["player01","player02"],
-          claimedslots: [],
-        }, { merge: true });
-
-        console.log(auth.currentUser.uid);
-        database.collection("users").doc(auth.currentUser.uid).update({
-          currentGame: `blackjack${this.roomCode}`
-        })
-        this.$router.push({ name: "blackjack" });
-      }
-      else{
-        alert("Login to create game");
-      }
+      this.$router.push({ name: "blackjacklobby" });
     },
   },
   created() {

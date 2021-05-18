@@ -1,179 +1,299 @@
 <template>
-    <div id="container">
-      <input type = "text" v-if= "!connected" v-on:input=" gameID = $event.target.value" placeholder="Game ID" ref="gameID"/>
-      <button v-if= "!connected" @click="input()">Input</button>
-      <button v-if= "!connected" v-on:click="connecttoGame">Connect to Game</button>
-      <button v-if= "connected" v-on:click="shuffleDeck">Shuffle Deck</button>
-      <button v-if= "connected && active" v-on:click="hit">Hit</button>
-      <button v-if= "connected && active" v-on:click="stand">Stand</button>
-      <div v-if= "connected">Deck size is: {{deckSize}}</div>
-      <div v-if= "connected">Value of your cards is: {{handValue}}</div>
-      <div v-if= "connected">Opponent hand size is: {{opponentHandSize}}</div>
-      <div v-if= "connected">Event log: {{eventLog}}</div>
-      <div id="player01hand"></div>
-      <div id="player02hand"></div>
+  <div>
+    <button id="leave">
+      <router-link to="home">Leave</router-link>
+    </button>
+    <div v-if="!gameStarted" class="game-interface">
+      <div>Code: {{ code }}</div>
+      <p v-for="(player, index) in playerNames" :key="index">
+        {{ player.name }}
+      </p>
+      <button
+        v-if="!disableStart && playersInLobby > 1 && master === true"
+        @click="start"
+      >
+        Start
+      </button>
+      <p v-if="playersInLobby <= 1">Waiting for more people to join...</p>
+      <p v-if="!master">Waiting for host to start...</p>
+      <p v-if="disableStart">Waiting for game to load...</p>
     </div>
+    <div v-if="gameStarted">
+      <div v-for="player in players" :key="player.name">
+        <div v-if="player.turnOrder == 1">{{ player.name }}'s Turn</div>
+      </div>
+      <div v-for="(hands, index) in players" :key="index" class="players">
+        <div v-if="hands.player">
+          <div v-if="hands.turnOrder != 1 && !hands.played">
+            Waiting for a player...
+          </div>
+          {{ hands.name }}
+          <br />
+          Score: {{ hands.cardScore }}
+          <br />
+          <div v-if="hands.blackJack">
+            BlackJack!!!
+          </div>
+          <div v-if="hands.busted">Busted!!!</div>
+          <div v-for="cards in hands.hand" :key="cards.code">
+            <img :src="cards.image" :alt="cards.code" class="card-image" />
+          </div>
+          <button v-if="hands.canHit" @click="hit(hands)">Hit</button>
+          <button v-if="hands.canHit" @click="stand(hands)">Stand</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
+
 <script>
-import { deck } from "../deck/deck.js"
-import {database, auth} from "@/firebase"
-var gameID = "placeholder";
-var playerID = "placeholder";
-const deckcodes = Object.keys(deck)
+import { deck } from "@/deck/deck";
+import { database } from "@/firebase.js";
 export default {
+  name: "Game",
   data() {
-    return {  
-      connected: false,
-      active: true,
-      deckSize: 52,
-      handValue: 0,
-      opponentHandSize: 0,
-      eventLog: "",
-      currGame: "",
-      loginStatus: false,
+    return {
+      i: 0,
+      master: false,
+      code: "",
+      disableStart: false,
+      deck: deck,
+      deckV: [],
+      name: "",
+      playersInLobby: 0,
+      playerNames: [],
+      players: [
+        {
+          player: true,
+          cardScore: 0,
+          hand: [],
+          name: "Player 1",
+          canHit: false,
+          blackJack: false,
+          busted: false,
+          turnOrder: null,
+          played: false,
+          stand: false,
+          result: ""
+        },
+        {
+          player: true,
+          cardScore: 0,
+          hand: [],
+          name: "Player 2",
+          canHit: false,
+          blackJack: false,
+          busted: false,
+          turnOrder: null,
+          played: false,
+          stand: false,
+          result: ""
+        }
+      ],
+      gameStarted: false,
+      finished: false,
+      lobby: "../../views/blackjacklobby.vue"
     };
   },
-  methods: {
-    connecttoGame: async function() {
-      if (this.loginStatus === false){
-        gameID = `blackjack${this.gameID}`;
-      }
-
-      await database.collection(gameID).doc("events").update({events: []});
-      // await database.collection(gameID).doc('players').update({availableslots: ["player01", "player02"]});
-      // await database.collection(gameID).doc('players').update({claimedslots: []});
-      const playerInfo = await database.collection(gameID).doc("players").get();
-      var availableSlots = playerInfo.data()["availableslots"]
-      var claimedSlots = playerInfo.data()["claimedslots"]
-      if (availableSlots.length !== 0) {
-        playerID = availableSlots[0]
-        this.connected = true;
-        claimedSlots.push(playerID)
-        availableSlots.splice(0,1);
-        await database.collection(gameID).doc('players').update({availableslots: availableSlots});
-        await database.collection(gameID).doc('players').update({claimedslots: claimedSlots});
-        const deck = database.collection(gameID).doc("deck");
-        deck.onSnapshot(deckSnapshot => {
-          const data = deckSnapshot.data();
-          this.deckSize = data["array"].length;
-        })
-        if (playerID === "player01") {
-          const opponentHand = database.collection(gameID).doc("player02data");
-          opponentHand.onSnapshot(opponentHandSnapshot => {
-          const data = opponentHandSnapshot.data();
-          this.opponentHandSize = data["hand"].length;
-        })
-        } else {
-          const opponentHand = database.collection(gameID).doc("player01data");
-          opponentHand.onSnapshot(opponentHandSnapshot => {
-          const data = opponentHandSnapshot.data();
-          this.opponentHandSize = data["hand"].length;
-        })
-        }
-        const events = database.collection(gameID).doc("events");
-        events.onSnapshot(eventsSnapshot => {
-        const data = eventsSnapshot.data();
-        this.eventLog = data["events"]
-        })
-      } else {
-        alert("Game is full.");
-      }
-    },
-    shuffleDeck: async function() {
-      for (let i = deckcodes.length - 1; i > -1; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [deckcodes[i], deckcodes[j]] = [deckcodes[j], deckcodes[i]];
-      }
-      const obj = {array: deckcodes}
-      await database.collection(gameID).doc('deck').set(obj);
-      await database.collection(gameID).doc('player01data').update({hand: []});
-      await database.collection(gameID).doc('player02data').update({hand: []});
-      document.getElementById(`${playerID}hand`).innerHTML = "";
-      const eventsData = await database.collection(gameID).doc('events').get()
-      var events = eventsData.data()["events"];
-      events.push(`${playerID} shuffled the deck`)
-      await database.collection(gameID).doc("events").update({events: events});
-      },
-    hit: async function() {
-        // const deck = database.collection("blackjack01").doc("deck");
-        const eventsData = await database.collection(gameID).doc('events').get()
-        var events = eventsData.data()["events"];
-        events.push(`${playerID} hit`)
-        await database.collection(gameID).doc("events").update({events: events});
-        const loadeddeck = await database.collection(gameID).doc("deck").get();
-        const data = loadeddeck.data();
-        const draw = data["array"].slice(0,1)
-        data["array"].splice(0,1);
-        const obj = {array: data["array"]}
-        await database.collection(gameID).doc('deck').set(obj);
-        const playerData = await database.collection(gameID).doc(`${playerID}data`).get();
-        var playerHand = playerData.data()["hand"];
-        playerHand.push(draw[0])
-        // console.log(playerHand)
-        await database.collection(gameID).doc(`${playerID}data`).update({hand: playerHand});
-        const image = deck[playerHand[playerHand.length-1]]["image"]; 
-        // console.log(image)
-        document.getElementById(`${playerID}hand`).innerHTML = document.getElementById(`${playerID}hand`).innerHTML + `<img src=${image} />`;
-        const playerDataContinued = database.collection(gameID).doc(`${playerID}data`);
-        playerDataContinued.onSnapshot(playerDataContinuedSnapshot => {
-          const playerHand = playerDataContinuedSnapshot.data()["hand"];
-          const activePlayer = playerDataContinuedSnapshot.data()["activePlayer"];
-          if (activePlayer == true) {
-            this.active = true
-          } else {
-            this.active = false
-          }
-          
-          // var standValue = 0;
-          console.log(`Player hand is ${playerHand}`)
-          playerHand.forEach((card) => {
-            // console.log(card)
-            console.log(deck[card])
-            this.handValue = deck[card]["blackjack"];
-            // deck[card]["blackjack"];
-          })
-        })
-      },
-    stand: async function() {
-        const eventsData = await database.collection(gameID).doc('events').get()
-        var events = eventsData.data()["events"];
-        events.push(`${playerID} stood`)
-        await database.collection(gameID).doc("events").update({events: events});
-        const playerData = await database.collection(gameID).doc(`${playerID}data`).get();
-        var playerHand = playerData.data()["hand"];
-        // console.log(`Player hand is ${playerHand}`)
-        var standValue = 0;
-        playerHand.forEach(function(card) {
-          // console.log(card)
-          standValue = standValue + deck[card]["blackjack"];
-        })
-        console.log(standValue)
-    },
-    //this is inefficient! but I am too tired to fix this atm 
-    getData: async function() {
-      const userData = await database.collection("users").doc(auth.currentUser.uid).get()
-      this.currGame = userData.data()["currentGame"];
-
-      if (this.currGame === "none"){
-          gameID = `blackjack${this.gameID}`;
-      }
-      else if (this.currGame !== "none"){
-          gameID = this.currGame;
-          this.connecttoGame();
-      }
-    }
+  props: {
+    gameCode: String
   },
-  created() {
-      auth.onAuthStateChanged((user) => {
-      if (user) {
-        this.loginStatus = true;
-        this.getData();
-      } else {
-        this.loginStatus = false;
+  async mounted() {
+    this.code = this.$route.params.data.code;
+    this.name = this.$route.params.data.name;
+    this.master = this.$route.params.data.master;
+    let game = await database.collection("games").doc(`blackjack${this.code}`);
+    await game.onSnapshot(async snapshot => {
+      let gameLobby = await snapshot.data().lobby;
+      this.playersInLobby = await gameLobby.lobbyPlayers.length;
+      for (let i = 0; i < gameLobby.lobbyPlayers.length; i++) {
+        if (i === 0) {
+          this.playerNames = [];
+        }
+        this.playerNames.push(gameLobby.lobbyPlayers[i]);
       }
+      console.log(this.playersInLobby);
+      console.log(this.playerNames);
     });
+  },
+  methods: {
+    start() {
+      this.disableStart = true;
+      this.gameStarted = true;
+    },
+    randomDeck() {
+      return Math.floor(Math.random() * this.deckV.length);
+    },
+    async deal() {
+      let vm = this;
+      this.disableStart = true;
+      await vm.reset();
+      /*       await dataBase.get().then(snapshot => {
+        let firestoreConsole = snapshot.data();
+        vm..players = firestoreConsole.players;
+        vm..deckV = firestoreConsole.deck;
+      }); */
+      vm.players.forEach(function(hands) {
+        hands.hand = [];
+        if (hands.player == true) {
+          for (let i = 0; i < 2; i++) {
+            hands.hand.push(vm.deckV[vm.randomDeck()]);
+            let last = hands.hand.length - 1;
+            let remove = vm.deckV.indexOf(hands.hand[last]);
+            vm.deckV.splice(remove, 1);
+          }
+          hands.hand.forEach(card => {
+            if (card.value == "ACE") {
+              card.blackjack = 11;
+            }
+            hands.cardScore += card.blackjack;
+          });
+        }
+        vm.check(hands);
+      });
+      this.randomizeOrder();
+      /*       await dataBase.update({
+        deckV: vm..deckV,
+        players: vm..players,
+        gameStarted: true
+      });
+      await dataBase.get().then(snapshot => {
+        let firestoreConsole = snapshot.data();
+        vm..gameStarted = firestoreConsole.gameStarted;
+      }); */
+    },
+    async reset() {
+      this.deckV = [];
+      this.finished = false;
+      this.gameStarted = false;
+      this.players.forEach(player => {
+        player.cardScore = 0;
+        player.hand = [];
+        player.canHit = false;
+        player.blackJack = false;
+        player.busted = false;
+        player.turnOrder = null;
+        player.played = false;
+        player.stand = false;
+        player.result = "";
+      });
+      /*       await dataBase
+        .update({
+          deckV: .deckV,
+          finished: .finished,
+          gameStarted: .gameStarted,
+          players: .players
+        })
+        .catch(err => {
+          console.log("error lol");
+          console.log(err);
+        }); */
+    },
+    async hit(playerHand) {
+      let randomHit = this.deckV[this.randomDeck()];
+      playerHand.hand.push(randomHit);
+      let last = playerHand.hand.length - 1;
+      let remove = this.deckV.indexOf(playerHand.hand[last]);
+      this.deckV.splice(remove, 1);
+      playerHand.cardScore +=
+        playerHand.hand[playerHand.hand.length - 1].blackjack;
+      playerHand.hand.forEach(card => {
+        if (card.value === "ACE") {
+          if (playerHand.cardScore >= 21 && card.blackjack != 1) {
+            playerHand.cardScore -= card.blackjack;
+            card.blackjack = 1;
+            playerHand.cardScore += card.blackjack;
+          }
+        }
+      });
+      this.check(playerHand);
+    },
+    async stand(player) {
+      player.canHit = false;
+      player.played = true;
+      player.stand = true;
+      this.check(player);
+    },
+    async check(playerStats) {
+      if (playerStats.cardScore > 21) {
+        playerStats.canHit = false;
+        playerStats.busted = true;
+        playerStats.played = true;
+      } else if (playerStats.cardScore == 21) {
+        playerStats.canHit = false;
+        playerStats.blackJack = true;
+        playerStats.played = true;
+      } else if (playerStats.stand == true) {
+        playerStats.canHit = false;
+        playerStats.played = true;
+      }
+      if (playerStats.played === true) {
+        this.players.forEach(player => {
+          player.turnOrder -= 1;
+          if (player.turnOrder <= 0) {
+            player.turnOrder = this.players.length;
+          }
+          if (player.turnOrder == 1 && !player.played) {
+            player.canHit = true;
+          }
+        });
+      }
+      function isFinished(el) {
+        return el.played === true;
+      }
+      if (this.players.every(isFinished)) {
+        this.finished = true;
+      }
+      /*       await dataBase.update({
+        players: this..players,
+        finished: this..finished
+      });
+      await dataBase
+        .get()
+        .then(snapshot => {
+          let firestoreConsole = snapshot.data();
+          this..players = firestoreConsole.players;
+          this..finished = firestoreConsole.finished;
+        })
+        .catch(err => {
+          console.log("error lul");
+          console.log(err);
+        }); */
+    },
+    randomizeOrder() {
+      let players = this.players.length;
+      let order = [];
+      for (let i = 1; i <= players; i++) {
+        order.push(i);
+      }
+      this.players.forEach(player => {
+        let random = Math.floor(Math.random() * order.length);
+        player.turnOrder = order[random];
+        order.splice(random, 1);
+        if (player.turnOrder == 1) {
+          player.canHit = true;
+        }
+      });
+    }
   }
-}
+};
 </script>
-<style>
+
+<style lang="scss" scoped>
+.game-interface {
+  font-size: 20px;
+}
+#leave {
+  display: block;
+  text-align: left;
+}
+.players {
+  justify-content: space-evenly;
+  font-size: 10px;
+  width: 100%;
+  display: flex;
+}
+.card-image {
+  width: 30%;
+}
 </style>
