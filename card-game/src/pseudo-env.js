@@ -1,10 +1,10 @@
 /* eslint-disable prettier/prettier */
-const APIKEY = "AIzaSyCJbc-hpm9TgE4UAJv1CPqm784EwwGessY";
-const AUTHDOMAIN = "auth-46878.firebaseapp.com";
-const PROJECTID = "auth-46878";
-const STORAGEBUCKET = "auth-46878.appspot.com";
-const MESSAGINGSENDERID = "1070842963615";
-const APPID = "1:1070842963615:web:6e9206051334e0080364aa";
+const APIKEY = "AIzaSyCQX_kaqDARgdz6veKLJYImO61f5a1yDug";
+const AUTHDOMAIN = "card-game-9455b.firebaseapp.com";
+const PROJECTID = "card-game-9455b";
+const STORAGEBUCKET = "card-game-9455b.appspot.com";
+const MESSAGINGSENDERID = "676118164486";
+const APPID = "1:676118164486:web:66900cb4ab9fcd601f7f87";
 
 export {
     APIKEY,

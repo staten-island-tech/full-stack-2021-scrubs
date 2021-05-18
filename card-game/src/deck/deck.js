@@ -3,7 +3,7 @@ const deck = [{
         code: "AS",
         image: require("@/deck/images/AS.png"),
         value: "ACE",
-        blackjack: 1 || 11,
+        blackjack: 11,
         suit: "SPADES"
     },
     {
@@ -94,7 +94,7 @@ const deck = [{
         code: "AD",
         image: require("@/deck/images/AD.png"),
         value: "ACE",
-        blackjack: 1 || 11,
+        blackjack: 11,
         suit: "DIAMONDS"
     },
     {
@@ -185,7 +185,7 @@ const deck = [{
         code: "AC",
         image: require("@/deck/images/AC.png"),
         value: "ACE",
-        blackjack: 1 || 11,
+        blackjack: 11,
         suit: "CLUBS"
     },
     {
@@ -276,7 +276,7 @@ const deck = [{
         code: "AH",
         image: require("@/deck/images/AH.png"),
         value: "ACE",
-        blackjack: 1 || 11,
+        blackjack: 11,
         suit: "HEARTS"
     },
     {

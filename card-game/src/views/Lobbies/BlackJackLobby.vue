@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Lobby :game="game" :gameType="gameType" @code="gameCode = $event" />
+    <Lobby :game="game" :gameType="gameType" :gameRoom="gameRoom" />
   </div>
 </template>
 
@@ -14,8 +14,8 @@ export default {
   data() {
     return {
       game: "BlackJack Lobby",
-      gameCode: "",
-      gameType: "BlackJackGame"
+      gameType: "BlackJackGame",
+      gameRoom: "BlackjackRoom"
     };
   },
   methods: {}

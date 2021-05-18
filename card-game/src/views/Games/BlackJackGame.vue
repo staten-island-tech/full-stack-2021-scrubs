@@ -1,201 +1,182 @@
 <template>
   <div>
-    <button id="leave">
-      <router-link to="Games">Leave</router-link>
-    </button>
-    <div v-if="!gameStarted" class="game-interface">
-      <div>Code: {{ code }}</div>
-      <p v-for="(player, index) in playerNames" :key="index">
-        {{ player.name }}
-      </p>
-      <button
-        v-if="!disableStart && playersInLobby > 1 && master === true"
-        @click="start"
-      >
-        Start
-      </button>
-      <p v-if="playersInLobby <= 1">Waiting for more people to join...</p>
-      <p v-if="!master">Waiting for host to start...</p>
-      <p v-if="disableStart">Waiting for game to load...</p>
-    </div>
-    <div v-if="gameStarted">
-      <div v-for="player in players" :key="player.name">
-        <div v-if="player.turnOrder == 1">{{ player.name }}'s Turn</div>
-      </div>
-      <div v-for="(hands, index) in players" :key="index" class="players">
-        <div v-if="hands.player">
-          <div v-if="hands.turnOrder != 1 && !hands.played">
-            Waiting for a player...
-          </div>
-          {{ hands.name }}
-          <br />
-          Score: {{ hands.cardScore }}
-          <br />
-          <div v-if="hands.blackJack">
-            BlackJack!!!
-          </div>
-          <div v-if="hands.busted">Busted!!!</div>
-          <div v-for="cards in hands.hand" :key="cards.code">
-            <img :src="cards.image" :alt="cards.code" class="card-image" />
-          </div>
-          <button v-if="hands.canHit" @click="hit(hands)">Hit</button>
-          <button v-if="hands.canHit" @click="stand(hands)">Stand</button>
+    <div class="game-interface">
+      <div v-if="finished === true">
+        <div v-if="victor == 'won'">
+          You Have Won!!!
         </div>
+        <div v-else-if="victor == 'tie'">
+          You Have Tied With Someone!
+        </div>
+        <div v-else-if="victor == 'lost'">
+          You Have Lost :(
+        </div>
+        <button @click="playAgain">Play Again?</button>
+      </div>
+      <div v-for="(player, index) in players" :key="index" class="players">
+        <div v-if="player.turnOrder == 1 && player.name !== name">
+          {{ player.name }}'s Turn
+        </div>
+        <div v-else-if="player.turnOrder == 1 && player.name === name">
+          Your Turn
+        </div>
+        <div
+          v-if="
+            player.turnOrder != 1 && player.name == name && finished !== true
+          "
+        >
+          Waiting for a player...
+        </div>
+        <div v-if="player.name !== name && finished !== true">
+          {{ player.name }}
+          <br />
+          Score: ???
+        </div>
+        <div v-else>
+          You
+          <br />
+          Score: {{ player.cardScore }}
+        </div>
+        <div v-if="player.blackJack && player.name === name">
+          BlackJack!!!
+        </div>
+        <div v-if="player.busted && player.name === name">Busted!!!</div>
+        <div v-for="(cards, index) in player.hand" :key="cards.code">
+          <img
+            v-if="index === 0 && player.name !== name"
+            src="../../deck/images/back.png"
+            alt="back"
+            class="card-image"
+          />
+          <img v-else :src="cards.image" :alt="cards.code" class="card-image" />
+        </div>
+        <button
+          v-if="
+            canHit === true &&
+              player.name == name &&
+              player.turnOrder === 1 &&
+              busted !== true &&
+              blackJack !== true &&
+              finished !== true
+          "
+          @click="hit(player)"
+        >
+          Hit
+        </button>
+        <button
+          v-if="
+            (canHit === true &&
+              player.name == name &&
+              player.turnOrder === 1 &&
+              player.played === false &&
+              finished !== true) ||
+              (player.busted === true &&
+                player.name === name &&
+                player.played === false &&
+                player.turnOrder === 1 &&
+                finished !== true) ||
+              (player.blackJack !== true &&
+                player.name === name &&
+                player.played === false &&
+                player.turnOrder === 1 &&
+                finished !== true)
+          "
+          @click="stand(player)"
+        >
+          Stand
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { deck } from "../../deck/deck.js";
 import { database } from "../../firebase.js";
+import { deck } from "../../deck/deck.js";
 
 export default {
   name: "Game",
   data() {
     return {
-      i: 0,
-      master: false,
+      blackJack: false,
+      cardScore: 0,
       code: "",
-      disableStart: false,
-      deck: deck,
-      deckV: [],
+      master: "",
       name: "",
-      playersInLobby: 0,
-      playerNames: [],
-      players: [
-        {
-          player: true,
-          cardScore: 0,
-          hand: [],
-          name: "Player 1",
-          canHit: false,
-          blackJack: false,
-          busted: false,
-          turnOrder: null,
-          played: false,
-          stand: false,
-          result: ""
-        },
-        {
-          player: true,
-          cardScore: 0,
-          hand: [],
-          name: "Player 2",
-          canHit: false,
-          blackJack: false,
-          busted: false,
-          turnOrder: null,
-          played: false,
-          stand: false,
-          result: ""
-        }
-      ],
-      gameStarted: false,
-      finished: false,
-      lobby: "../../views/Lobbies/BlackJackLobby.vue"
+      deck: deck,
+      canHit: false,
+      busted: false,
+      played: false,
+      finished: true,
+      victor: false,
+      players: [],
+      lobby: "../../views/Lobbies/BlackJackLobby.vue",
+      i: 0,
+      gameStarted: false
     };
-  },
-  props: {
-    gameCode: String
   },
   async mounted() {
     this.code = this.$route.params.data.code;
     this.name = this.$route.params.data.name;
     this.master = this.$route.params.data.master;
+    console.log("connected to the game!");
     let game = await database.collection("games").doc(`blackjack${this.code}`);
-    await game.onSnapshot(async snapshot => {
-      let gameLobby = await snapshot.data().lobby;
-      this.playersInLobby = await gameLobby.lobbyPlayers.length;
-      for (let i = 0; i < gameLobby.lobbyPlayers.length; i++) {
-        if (i === 0) {
-          this.playerNames = [];
+    game.onSnapshot(snapshot => {
+      let data = snapshot.data();
+      this.deck = data.deck;
+      this.players = data.gamePlayers;
+      this.finished = data.finished;
+      data.gamePlayers.forEach(player => {
+        if (player.turnOrder === 1) {
+          player.canHit = true;
+          if (player.name == this.name) {
+            this.canHit = true;
+          }
+          if (player.name == this.name) {
+            player.hand.forEach(hand => {
+              this.cardScore = hand.blackjack;
+            });
+          }
         }
-        this.playerNames.push(gameLobby.lobbyPlayers[i]);
+      });
+      if (this.i === 0 && data.finished === true) {
+        this.i = this.i + 1;
+        this.determineWinner();
       }
-      console.log(this.playersInLobby);
-      console.log(this.playerNames);
     });
+    //dealing
+    if (this.master === true) {
+      game.get().then(doc => {
+        let players = doc.data().gamePlayers;
+        this.randomizeOrder(players);
+        players.forEach(player => {
+          for (let i = 0; i < 2; i++) {
+            let randomCard = this.deck[this.randomDeck()];
+            player.hand.push(randomCard);
+            let last = player.hand.length - 1;
+            let remove = this.deck.indexOf(player.hand[last]);
+            this.deck.splice(remove, 1);
+            player.cardScore += randomCard.blackjack;
+            this.check(player);
+          }
+        });
+        game.update({
+          deck: this.deck,
+          gamePlayers: players
+        });
+      });
+    }
   },
   methods: {
-    start() {
-      this.disableStart = true;
-      this.gameStarted = true;
-    },
     randomDeck() {
-      return Math.floor(Math.random() * this.deckV.length);
+      return Math.floor(Math.random() * this.deck.length);
     },
-    async deal() {
-      let vm = this;
-      this.disableStart = true;
-      await vm.reset();
-      /*       await dataBase.get().then(snapshot => {
-        let firestoreConsole = snapshot.data();
-        vm..players = firestoreConsole.players;
-        vm..deckV = firestoreConsole.deck;
-      }); */
-      vm.players.forEach(function(hands) {
-        hands.hand = [];
-        if (hands.player == true) {
-          for (let i = 0; i < 2; i++) {
-            hands.hand.push(vm.deckV[vm.randomDeck()]);
-            let last = hands.hand.length - 1;
-            let remove = vm.deckV.indexOf(hands.hand[last]);
-            vm.deckV.splice(remove, 1);
-          }
-          hands.hand.forEach(card => {
-            if (card.value == "ACE") {
-              card.blackjack = 11;
-            }
-            hands.cardScore += card.blackjack;
-          });
-        }
-        vm.check(hands);
-      });
-      this.randomizeOrder();
-      /*       await dataBase.update({
-        deckV: vm..deckV,
-        players: vm..players,
-        gameStarted: true
-      });
-      await dataBase.get().then(snapshot => {
-        let firestoreConsole = snapshot.data();
-        vm..gameStarted = firestoreConsole.gameStarted;
-      }); */
-    },
-    async reset() {
-      this.deckV = [];
-      this.finished = false;
-      this.gameStarted = false;
-      this.players.forEach(player => {
-        player.cardScore = 0;
-        player.hand = [];
-        player.canHit = false;
-        player.blackJack = false;
-        player.busted = false;
-        player.turnOrder = null;
-        player.played = false;
-        player.stand = false;
-        player.result = "";
-      });
-      /*       await dataBase
-        .update({
-          deckV: .deckV,
-          finished: .finished,
-          gameStarted: .gameStarted,
-          players: .players
-        })
-        .catch(err => {
-          console.log("error lol");
-          console.log(err);
-        }); */
-    },
-    async hit(playerHand) {
-      let randomHit = this.deckV[this.randomDeck()];
+    hit(playerHand) {
+      let randomHit = this.deck[this.randomDeck(playerHand)];
       playerHand.hand.push(randomHit);
       let last = playerHand.hand.length - 1;
-      let remove = this.deckV.indexOf(playerHand.hand[last]);
-      this.deckV.splice(remove, 1);
+      let remove = this.deck.indexOf(playerHand.hand[last]);
+      this.deck.splice(remove, 1);
       playerHand.cardScore +=
         playerHand.hand[playerHand.hand.length - 1].blackjack;
       playerHand.hand.forEach(card => {
@@ -209,22 +190,28 @@ export default {
       });
       this.check(playerHand);
     },
-    async stand(player) {
-      player.canHit = false;
-      player.played = true;
+    stand(player) {
       player.stand = true;
       this.check(player);
     },
-    async check(playerStats) {
-      if (playerStats.cardScore > 21) {
+    check(playerStats) {
+      if (playerStats.cardScore > 21 && playerStats.name === this.name) {
+        this.canHit = false;
+        this.busted = true;
         playerStats.canHit = false;
         playerStats.busted = true;
-        playerStats.played = true;
-      } else if (playerStats.cardScore == 21) {
+      } else if (
+        playerStats.cardScore === 21 &&
+        playerStats.name === this.name
+      ) {
+        this.canHit = false;
+        this.blackJack = true;
         playerStats.canHit = false;
         playerStats.blackJack = true;
-        playerStats.played = true;
-      } else if (playerStats.stand == true) {
+      }
+      if (playerStats.stand == true) {
+        this.canHit = false;
+        this.played = true;
         playerStats.canHit = false;
         playerStats.played = true;
       }
@@ -244,37 +231,107 @@ export default {
       }
       if (this.players.every(isFinished)) {
         this.finished = true;
+        this.gameStarted = false;
+        this.determineWinner();
       }
-      /*       await dataBase.update({
-        players: this..players,
-        finished: this..finished
-      });
-      await dataBase
-        .get()
-        .then(snapshot => {
-          let firestoreConsole = snapshot.data();
-          this..players = firestoreConsole.players;
-          this..finished = firestoreConsole.finished;
-        })
-        .catch(err => {
-          console.log("error lul");
-          console.log(err);
-        }); */
+      database
+        .collection("games")
+        .doc(`blackjack${this.code}`)
+        .update({
+          gamePlayers: this.players,
+          finished: this.finished,
+          gameStarted: this.gameStarted
+        });
     },
-    randomizeOrder() {
-      let players = this.players.length;
-      let order = [];
-      for (let i = 1; i <= players; i++) {
-        order.push(i);
+    determineWinner() {
+      let cardScores = [];
+      let opposingVictor = false;
+      let opposingBusted = false;
+      this.players.forEach(player => {
+        if (player.name !== this.name) {
+          if (player.blackJack === true) {
+            opposingVictor = true;
+          }
+          if (player.busted === true) {
+            opposingBusted = true;
+          }
+          if (player.busted !== true && player.blackJack !== true) {
+            cardScores.push(player.cardScore);
+          }
+        }
+      });
+      console.log(Math.max(cardScores), opposingVictor);
+      if (
+        (this.blackJack === true && opposingVictor === true) ||
+        (this.busted === true &&
+          opposingBusted === true &&
+          opposingVictor !== true &&
+          cardScores.length === 0) ||
+        ((this.cardScore === Math.max(cardScores)) === true &&
+          opposingVictor !== true)
+      ) {
+        this.victor = "tie";
+      } else if (
+        (this.blackJack === true && opposingVictor !== true) ||
+        (this.cardScore > Math.max(cardScores) === true &&
+          opposingVictor !== true)
+      ) {
+        this.victor = "won";
+      } else {
+        this.victor = "lost";
       }
       this.players.forEach(player => {
+        if (player.name === this.name) {
+          player.victor = this.victor;
+        }
+      });
+      console.log(this.victor, this.players);
+      database
+        .collection("games")
+        .doc(`blackjack${this.code}`)
+        .update({
+          gamePlayers: this.players
+        });
+    },
+    randomizeOrder(players) {
+      let totalPlayers = players.length;
+      let order = [];
+      for (let i = 1; i <= totalPlayers; i++) {
+        order.push(i);
+      }
+      players.forEach(player => {
         let random = Math.floor(Math.random() * order.length);
         player.turnOrder = order[random];
         order.splice(random, 1);
-        if (player.turnOrder == 1) {
-          player.canHit = true;
-        }
       });
+    },
+    async playAgain() {
+      let game = await database
+        .collection("games")
+        .doc(`blackjack${this.code}`);
+      game.get().then(doc => {
+        let lobbyPeople = doc.data().lobby.lobbyPlayers;
+        lobbyPeople.push({
+          master: this.master,
+          name: this.name
+        });
+        game.update(
+          {
+            lobby: {
+              lobbyPlayers: lobbyPeople
+            }
+          },
+          {
+            merge: true
+          }
+        );
+      });
+      let data = {
+        name: this.name,
+        code: this.code,
+        master: this.master
+      };
+      this.$router.push({ name: "BlackjackRoom", params: { data } });
     }
   }
 };
@@ -294,10 +351,9 @@ export default {
   justify-content: space-evenly;
   font-size: 10px;
   width: 100%;
-  display: flex;
 }
 
 .card-image {
-  width: 30%;
+  width: 10%;
 }
 </style>

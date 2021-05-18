@@ -5,6 +5,12 @@ import Home from "../views/UserInterface/Home.vue";
 
 Vue.use(VueRouter);
 
+const originalPush = VueRouter.prototype.push;
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch((error) => { //eslint-disable-line no-unused-vars
+
+  });
+};
 // eslint-disable-next-line prettier/prettier
 const routes = [{
     path: "/",
@@ -62,6 +68,12 @@ const routes = [{
     path: "/BlackJackGame",
     name: "BlackJackGame",
     component: () => import("../views/Games/BlackJackGame.vue"),
+    props: true,
+  },
+  {
+    path: "/BlackjackRoom",
+    name: "BlackjackRoom",
+    component: () => import("../views/Rooms/BlackjackRoom.vue"),
     props: true,
   }
 ];

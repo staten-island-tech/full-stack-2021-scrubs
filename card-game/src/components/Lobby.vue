@@ -31,7 +31,6 @@
 
 <script>
 import { database } from "@/firebase";
-import { deck } from "@/deck/deck";
 
 export default {
   name: "Lobby",
@@ -49,7 +48,8 @@ export default {
   },
   props: {
     game: String,
-    gameType: String
+    gameType: String,
+    gameRoom: String
   },
   methods: {
     generateID() {
@@ -59,7 +59,6 @@ export default {
         this.roomCode += lastLetter;
       }
       console.log(this.roomCode);
-      this.$emit("code", this.roomCode);
     },
     async createRoom() {
       if (this.playerStatus.name.length > 0) {
@@ -70,13 +69,11 @@ export default {
         this.playerStatus.master = true;
         newGame.set(
           {
-            events: [],
             gamePlayers: [],
             lobby: {
               slots: 1,
               lobbyPlayers: [this.playerStatus]
-            },
-            deck: deck
+            }
           },
           {
             merge: true
@@ -87,7 +84,7 @@ export default {
           name: this.playerStatus.name,
           master: this.playerStatus.master
         };
-        this.$router.push({ name: this.gameType, params: { data } });
+        this.$router.push({ name: this.gameRoom, params: { data } });
       } else {
         alert("Enter A Name!");
       }
@@ -136,7 +133,7 @@ export default {
               name: this.playerStatus.name,
               master: this.playerStatus.master
             };
-            this.$router.push({ name: this.gameType, params: { data } });
+            this.$router.push({ name: this.gameRoom, params: { data } });
           } else {
             alert(`Room is full!`);
           }
