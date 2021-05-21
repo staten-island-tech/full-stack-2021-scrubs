@@ -19,6 +19,16 @@ const routes = [{
     component: Home
   },
   {
+    path: "/auth",
+    name: "auth",
+    component: () => import("../views/UserInterface/auth.vue")
+  },
+  {
+    path: "/authCreate",
+    name: "authCreate",
+    component: () => import("../views/UserInterface/authCreate.vue")
+  },
+  {
     path: "/BlackJacklobby",
     name: "BlackJackLobby",
     component: () => import("../views/Lobbies/BlackJackLobby.vue")

@@ -32,6 +32,9 @@ export default {
     playGame: function () {
       this.$router.push({ name: "BlackJackLobby" });
     },
+    login: function () {
+    this.$router.push({ name: "auth" });
+    },
   },
   created() {
     auth.onAuthStateChanged((user) => {
