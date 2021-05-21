@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     playGame: function () {
-      this.$router.push({ name: "blackjacklobby" });
+      this.$router.push({ name: "BlackJackLobby" });
     },
   },
   created() {

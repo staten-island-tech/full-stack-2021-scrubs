@@ -9,7 +9,7 @@
 </template>
 <script>
 import {auth} from "@/firebase"
-import {user} from "../views/auth.vue"
+import {user} from "./auth.vue"
 // console.log(user)
 export default {
   data() {
