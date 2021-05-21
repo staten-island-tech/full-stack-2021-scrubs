@@ -29,6 +29,11 @@ const routes = [{
     component: () => import("../views/UserInterface/authCreate.vue")
   },
   {
+    path: "/signedIn",
+    name: "signedIn",
+    component: () => import("../views/UserInterface/signedIn.vue")
+  },
+  {
     path: "/BlackJacklobby",
     name: "BlackJackLobby",
     component: () => import("../views/Lobbies/BlackJackLobby.vue")

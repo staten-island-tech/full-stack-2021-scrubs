@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <input type = "text" v-on:input=" username= $event.target.value" placeholder="Username" ref="username"/>
+    <input type = "text" v-on:input=" username= $event.target.value" placeholder="Email" ref="username"/>
     <input type = "text" v-on:input=" password= $event.target.value" placeholder="Password" ref="password"/>
     <button @click="signIn()">Sign In</button>
     <button @click="accountCreation()">Create Account</button>

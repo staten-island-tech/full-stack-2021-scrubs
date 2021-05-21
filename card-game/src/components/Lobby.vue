@@ -4,14 +4,7 @@
     <div>{{ gameType }}</div>
     <br />
     <div class="player" v-if="play">
-      <form>
-        Please enter a name:
-        <input
-          type="text"
-          placeholder="Put In Your Name"
-          v-model="playerStatus.name"
-        />
-      </form>
+    <div>Playing As: {{ playerStatus.name }}</div>
       <br />
       <button class="player-button" @click="createRoom">Create Game</button>
       <br />
@@ -30,14 +23,14 @@
 </template>
 
 <script>
-import { database } from "@/firebase";
+import { auth, database } from "@/firebase";
 export default {
   name: "Lobby",
   data() {
     return {
       playerStatus: {
         master: "",
-        name: ""
+        name: auth.currentUser.displayName,
       },
       play: true,
       roomCode: "",
