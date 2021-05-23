@@ -1,25 +1,41 @@
-import { firebase } from '@firebase/app'
-import 'firebase/auth'
-import 'firebase/firestore'
+/* eslint-disable prettier/prettier */
+import {
+  firebase
+} from "@firebase/app";
+import "firebase/auth";
+import "firebase/firestore";
+import {
+  APIKEY
+} from "./pseudo-env.js";
+import {
+  AUTHDOMAIN
+} from "./pseudo-env.js";
+import {
+  PROJECTID
+} from "./pseudo-env.js";
+import {
+  STORAGEBUCKET
+} from "./pseudo-env.js";
+import {
+  MESSAGINGSENDERID
+} from "./pseudo-env.js";
+import {
+  APPID
+} from "./pseudo-env.js";
 
 var firebaseConfig = {
-    apiKey: "AIzaSyBQ2s-OVvFfRHB8z8X6dxjqfkV3MRzdocU",
-    authDomain: "apcompscicardgame.firebaseapp.com",
-    projectId: "apcompscicardgame",
-    storageBucket: "apcompscicardgame.appspot.com",
-    messagingSenderId: "880409666274",
-    appId: "1:880409666274:web:2d2460831bc4da788234bb",
-    measurementId: "G-Q4NTPMJF1Z"
-  };
+  apiKey: APIKEY,
+  authDomain: AUTHDOMAIN,
+  projectId: PROJECTID,
+  storageBucket: STORAGEBUCKET,
+  messagingSenderId: MESSAGINGSENDERID,
+  appId: APPID
+};
+firebase.initializeApp(firebaseConfig);
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-
-  // some consts to use as references for future coding - makes life easier
-const database = firebase.firestore()
-const auth = firebase.auth()
-
+const auth = firebase.auth();
+const database = firebase.firestore();
 export {
-    database,
-    auth
-}
+  auth,
+  database
+};
