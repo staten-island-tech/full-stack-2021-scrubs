@@ -24,7 +24,7 @@ export default {
           console.log(userCredential)
           user = userCredential.user;
           console.log(user)
-          this.$router.push({ name: '' });
+          this.$router.push('/') //only fix to go back to default
         }).catch((error) => {
           var errorMessage = error.message;
           alert(errorMessage);
