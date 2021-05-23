@@ -1,6 +1,6 @@
 <template>
   <div>
-    <router-link id="games" to="/Games">Back</router-link>
+    <router-link id="games" to="/">Back</router-link>
     <div>{{ gameType }}</div>
     <br />
     <div class="player" v-if="play">

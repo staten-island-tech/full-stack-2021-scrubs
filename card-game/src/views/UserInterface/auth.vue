@@ -23,7 +23,7 @@ export default {
           console.log(userCredential)
           user = userCredential.user;
           console.log(user)
-          this.$router.push({ name: 'signedIn' });
+          this.$router.push({ name: '' });
         }).catch((error) => {
           var errorMessage = error.message;
           alert(errorMessage);
