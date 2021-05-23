@@ -151,8 +151,18 @@ export default {
   color: #ffd600;
   font-size: 2rem;
 }
-#input {
+#input-btn {
+  border-radius: 5px;
+  background-color: rgba(35, 17, 35, 0.42);
+  color: #ffd600;
+  font-size: 1.6rem;
+  margin-top: 5px;
 }
-#connect {
+#connect-btn {
+  border-radius: 5px;
+  background-color: rgba(35, 17, 35, 0.42);
+  color: #ffd600;
+  font-size: 1.6rem;
+  margin-top: 5px;
 }
 </style>

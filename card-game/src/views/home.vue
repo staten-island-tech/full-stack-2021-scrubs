@@ -47,9 +47,6 @@ export default {
 };
 </script>
 <style lang="scss">
-$colors: (
-  primary: #ac0000,
-);
 html {
   font-size: 62.5%;
   margin: 0;
@@ -61,7 +58,7 @@ html {
   height: 99vh;
   background-image: radial-gradient(
       50% 50% at 50% 50%,
-      rgba($primary, 0.87) 0%,
+      rgba(#ac0000, 0.87) 0%,
       rgba(#690000, 0.87) 100%
     ),
     url(../assets/vegasbkgd.jpg);
