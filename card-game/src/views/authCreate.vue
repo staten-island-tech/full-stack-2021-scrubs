@@ -3,13 +3,15 @@
     <div class="container-inputs">
       <input
         class="username"
+        aria-label="email"
         type="text"
         v-on:input="usernameCreate = $event.target.value"
-        placeholder="Username"
+        placeholder="Email"
         ref="usernameCreate"
       />
       <input
         class="password"
+        aria-label="password"
         type="text"
         v-on:input="passwordCreate = $event.target.value"
         placeholder="Password"

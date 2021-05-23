@@ -8,24 +8,18 @@
       href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
       rel="stylesheet"
     />
-    <div class="container-buttons">
-      <button class="container-buttons-button" v-on:click="play = !play">
-        Play
-      </button>
+    <nav class="container-buttons">
       <button class="container-buttons-button">About</button>
       <button class="container-buttons-button">Credits</button>
       <button class="container-buttons-button">Donate</button>
       <button class="container-buttons-button" @click="auth()">
         Log In | Sign Up
       </button>
-    </div>
-    <p class="container-title">It's Not An Addiction Casino</p>
-    <transition name="fade">
-      <div class="player" v-if="play">
-        <button class="player-button">Create Game</button>
-        <button class="player-button" @click="playGame()">Join Game</button>
-      </div>
-    </transition>
+    </nav>
+    <h1 class="container-title">It's Not An Addiction Casino</h1>
+    <nav class="play-game">
+      <button class="play-button" v-on:click="play = !play">Play</button>
+    </nav>
   </section>
 </template>
 
@@ -54,8 +48,12 @@ html {
   box-sizing: border-box;
 }
 
+body {
+  margin: 0;
+}
+
 .container {
-  height: 99vh;
+  height: 100vh;
   background-image: radial-gradient(
       50% 50% at 50% 50%,
       rgba(#ac0000, 0.87) 0%,
@@ -85,33 +83,36 @@ html {
 }
 
 .container-title {
-  text-align: center;
+  background: rgba(35, 17, 35, 0.42);
   font-size: 7.2rem;
   font-family: Grand Hotel;
   font-style: normal;
   font-weight: normal;
+  position: absolute;
+  left: 32.5%;
+  width: 35%;
+  border-radius: 2.5rem;
 
   color: #ffd600;
+  text-shadow: 0.5rem 0.5rem 0.5rem #231123;
 }
 
-.player {
-  text-align: center;
+.play-game {
+  position: absolute;
+  top: 45%;
+  left: 47.5%;
 }
 
-.player-button {
-  font-size: 3rem;
+.play-button {
+  margin-top: 10px;
+  font-size: 6rem;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
   color: #ffd600;
   background: rgba(35, 17, 35, 0.42);
   border: 1px solid #231123;
   box-shadow: 0px 4px 17px rgba(152, 73, 0, 0.25);
-  border-radius: 5px;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
+  border-radius: 1.5rem;
 }
 </style>

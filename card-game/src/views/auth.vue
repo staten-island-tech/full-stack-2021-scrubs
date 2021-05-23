@@ -1,23 +1,27 @@
 <template>
   <section class="container">
-    <div class="container-inputs">
+    <nav class="user-password-inputs">
       <input
         class="username"
+        aria-label="email"
         type="text"
         v-on:input="username = $event.target.value"
-        placeholder="Username"
+        placeholder="Email"
         ref="username"
       />
       <input
         class="password"
+        aria-label="password"
         type="text"
         v-on:input="password = $event.target.value"
         placeholder="Password"
         ref="password"
       />
-    </div>
-    <button class="signin" @click="signIn()">Sign In</button>
-    <button class="create" @click="accountCreation()">Create Account</button>
+    </nav>
+    <nav class="login-create">
+      <button class="signin" @click="signIn()">Sign In</button>
+      <button class="create" @click="accountCreation()">Create Account</button>
+    </nav>
   </section>
 </template>
 <script>
@@ -85,6 +89,7 @@ export { user };
   box-shadow: 0px 4px 17px rgba(152, 73, 0, 0.25);
   border-radius: 5px;
   margin-right: 5px;
+  font-size: 2rem;
 }
 
 .create {
@@ -94,5 +99,6 @@ export { user };
   box-shadow: 0px 4px 17px rgba(152, 73, 0, 0.25);
   border-radius: 5px;
   margin-left: 5px;
+  font-size: 2rem;
 }
 </style>
