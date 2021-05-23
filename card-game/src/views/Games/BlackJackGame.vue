@@ -1,3 +1,4 @@
+  
 <template>
   <div>
     <div class="game-interface">
@@ -225,6 +226,9 @@ export default {
           }
         });
       }
+      if (playerStats.name === this.name) {
+        this.cardScore = playerStats.cardScore;
+      }
       function isFinished(el) {
         return el.played === true;
       }
@@ -259,21 +263,19 @@ export default {
           }
         }
       });
-      console.log(Math.max(cardScores), opposingVictor);
+      console.log(Math.max(...cardScores), opposingVictor, this.cardScore);
       if (
         (this.blackJack === true && opposingVictor === true) ||
         (this.busted === true &&
           opposingBusted === true &&
           opposingVictor !== true &&
           cardScores.length === 0) ||
-        ((this.cardScore === Math.max(cardScores)) === true &&
-          opposingVictor !== true)
+        (this.cardScore === Math.max(...cardScores) && opposingVictor !== true)
       ) {
         this.victor = "tie";
       } else if (
         (this.blackJack === true && opposingVictor !== true) ||
-        (this.cardScore > Math.max(cardScores) === true &&
-          opposingVictor !== true)
+        (this.cardScore > Math.max(...cardScores) && opposingVictor !== true)
       ) {
         this.victor = "won";
       } else {
