@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <router-link id="games" to="/">Back</router-link>
     <input type = "text" v-on:input=" emailCreate= $event.target.value" placeholder="Email" ref = "emailCreate"/>
     <input type = "text" v-on:input=" usernameCreate= $event.target.value" placeholder="Username" ref = "usernameCreate"/>
     <input type = "text" v-on:input=" passwordCreate= $event.target.value" placeholder="Password" ref = "passwordCreate"/>

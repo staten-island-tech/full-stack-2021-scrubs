@@ -9,7 +9,8 @@
       <button class="container-buttons-button">About</button>
       <button class="container-buttons-button">Credits</button>
       <button class="container-buttons-button">Donate</button>
-      <button class="container-buttons-button" @click="login()">
+      <button v-if="loginStatus" class="container-buttons-button" @click="logout()">Log Out</button>
+      <button v-else class="container-buttons-button" @click="login()">
         Log In | Sign Up
       </button>
     </div>
@@ -30,11 +31,22 @@ export default {
   },
   methods: {
     playGame: function () {
-      this.$router.push({ name: "BlackJackLobby" });
+      if (this.loginStatus === true){
+        this.$router.push({ name: "BlackJackLobby" });
+      }else{
+        this.$router.push({ name: "auth" });
+      }
     },
     login: function () {
-    this.$router.push({ name: "auth" });
+      this.$router.push({ name: "auth" });
     },
+    logout: function() {
+      auth.signOut().then(() => {
+      console.log("signed out");
+      }).catch((error) => {
+      console.log(error);
+      });
+    }
   },
   created() {
     auth.onAuthStateChanged((user) => {
