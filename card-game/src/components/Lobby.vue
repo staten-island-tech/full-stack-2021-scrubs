@@ -1,25 +1,31 @@
 <template>
-  <div>
-    <router-link id="games" to="/">Back</router-link>
+  <section class="container" id="lobby">
+    <router-link class="lobby-back" id="games" to="/">Back</router-link>
     <div>{{ gameType }}</div>
     <br />
     <div class="player" v-if="play">
-    <div>Playing As: {{ playerStatus.name }}</div>
+      <h3>Playing As: {{ playerStatus.name }}</h3>
       <br />
       <button class="player-button" @click="createRoom">Create Game</button>
       <br />
-      <p>or</p>
+      <h5>or</h5>
       <form>
         <br />
         <input
           type="text"
+          class="code"
           placeholder="Put in the 4 digit code"
           v-model="joinCode"
         />
-        <input type="submit" value="Join Game" @click.prevent="joinGame" />
+        <input
+          class="join"
+          type="submit"
+          value="Join Game"
+          @click.prevent="joinGame"
+        />
       </form>
     </div>
-  </div>
+  </section>
 </template>
 
 <script>
@@ -35,13 +41,13 @@ export default {
       play: true,
       roomCode: "",
       // loginStatus: true,
-      joinCode: ""
+      joinCode: "",
     };
   },
   props: {
     game: String,
     gameType: String,
-    gameRoom: String
+    gameRoom: String,
   },
   methods: {
     generateID() {
@@ -64,17 +70,17 @@ export default {
             gamePlayers: [],
             lobby: {
               slots: 1,
-              lobbyPlayers: [this.playerStatus]
-            }
+              lobbyPlayers: [this.playerStatus],
+            },
           },
           {
-            merge: true
+            merge: true,
           }
         );
         let data = {
           code: this.roomCode,
           name: this.playerStatus.name,
-          master: this.playerStatus.master
+          master: this.playerStatus.master,
         };
         this.$router.push({ name: this.gameRoom, params: { data } });
       } else {
@@ -87,19 +93,19 @@ export default {
           .collection("games")
           .doc(`blackjack${this.joinCode}`)
           .get()
-          .then(snapshot => {
+          .then((snapshot) => {
             return snapshot.exists;
           });
         if (codeExists === true) {
           let lobby = database
             .collection("games")
             .doc(`blackjack${this.joinCode}`);
-          let slot = await lobby.get().then(snapshot => {
+          let slot = await lobby.get().then((snapshot) => {
             return snapshot.data().lobby.slots;
           });
           if (slot !== 0) {
             let playerData;
-            await lobby.get().then(doc => {
+            await lobby.get().then((doc) => {
               for (let i = 0; i < doc.data().lobby.lobbyPlayers.length; i++) {
                 playerData = doc.data().lobby.lobbyPlayers;
               }
@@ -107,23 +113,23 @@ export default {
             this.playerStatus.master = false;
             playerData.push({
               master: this.playerStatus.master,
-              name: this.playerStatus.name
+              name: this.playerStatus.name,
             });
             await lobby.set(
               {
                 lobby: {
                   lobbyPlayers: playerData,
-                  slots: slot - 1
-                }
+                  slots: slot - 1,
+                },
               },
               {
-                merge: true
+                merge: true,
               }
             );
             let data = {
               code: this.joinCode,
               name: this.playerStatus.name,
-              master: this.playerStatus.master
+              master: this.playerStatus.master,
             };
             this.$router.push({ name: this.gameRoom, params: { data } });
           } else {
@@ -135,10 +141,53 @@ export default {
       } else {
         alert("The Code is 4 Letters");
       }
-    }
-  }
+    },
+  },
 };
 </script>
+
+<style lang="scss">
+.player-button {
+  color: #ffd600;
+  background: rgba(35, 17, 35, 0.42);
+  border: 1px solid #231123;
+  box-shadow: 0px 4px 17px rgba(152, 73, 0, 0.25);
+  border-radius: 5px;
+  font-size: 3rem;
+}
+
+.code {
+  margin-right: 5px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  background-color: rgba(35, 17, 35, 0.42);
+  color: #ffd600;
+  font-size: 3rem;
+}
+
+.join {
+  color: #ffd600;
+  background: rgba(35, 17, 35, 0.42);
+  border: 1px solid #231123;
+  box-shadow: 0px 4px 17px rgba(152, 73, 0, 0.25);
+  border-radius: 5px;
+  font-size: 3rem;
+}
+
+.lobby-back {
+  position: absolute;
+  left: 48%;
+  top: 50%;
+  font-size: 3rem;
+  color: #ffd600;
+  background: rgba(35, 17, 35, 0.42);
+  border: 1px solid #231123;
+  box-shadow: 0px 4px 17px rgba(152, 73, 0, 0.25);
+  border-radius: 5px;
+  text-decoration: none;
+  width: 8rem;
+}
+</style>
 
 <style lang="scss" scoped>
 table,

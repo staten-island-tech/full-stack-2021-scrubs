@@ -12,67 +12,31 @@
       <button class="container-buttons-button">About</button>
       <button class="container-buttons-button">Credits</button>
       <button class="container-buttons-button">Donate</button>
-      <button
-        v-if="loginStatus"
-        class="container-buttons-button"
-        @click="logout()"
-      >
-        Log Out
-      </button>
-      <button v-else class="container-buttons-button" @click="login()">
+      <button class="container-buttons-button" @click="auth()">
         Log In | Sign Up
       </button>
     </nav>
     <h1 class="container-title">It's Not An Addiction Casino</h1>
     <nav class="play-game">
-      <button class="play-button" @click="playGame()">Play</button>
+      <button class="play-button" v-on:click="play = !play">Play</button>
     </nav>
   </section>
 </template>
 
 <script>
-import { auth } from "@/firebase";
-
 export default {
   data() {
     return {
       play: false,
-      roomCode: "",
-      loginStatus: true,
     };
   },
   methods: {
     playGame: function () {
-      if (this.loginStatus === true) {
-        this.$router.push({ name: "BlackJackLobby" });
-      } else {
-        this.$router.push({ name: "auth" });
-      }
+      this.$router.push({ name: "blackjack" });
     },
-    login: function () {
+    auth: function () {
       this.$router.push({ name: "auth" });
     },
-    logout: function () {
-      auth
-        .signOut()
-        .then(() => {
-          console.log("signed out");
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-  },
-  created() {
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        this.loginStatus = true;
-        console.log(this.loginStatus);
-      } else {
-        this.loginStatus = false;
-        console.log(this.loginStatus);
-      }
-    });
   },
 };
 </script>
@@ -91,10 +55,11 @@ body {
 .container {
   height: 100vh;
   background-image: radial-gradient(
-    50% 50% at 50% 50%,
-    rgba(#ac0000, 0.87) 0%,
-    rgba(#690000, 0.87) 100%
-  );
+      50% 50% at 50% 50%,
+      rgba(#ac0000, 0.87) 0%,
+      rgba(#690000, 0.87) 100%
+    ),
+    url(../assets/vegasbkgd.jpg);
 }
 
 .container-buttons {
