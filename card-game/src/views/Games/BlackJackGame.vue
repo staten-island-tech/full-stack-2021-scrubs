@@ -2,15 +2,9 @@
   <div>
     <div class="game-interface">
       <div v-if="finished === true">
-        <div v-if="victor == 'won'">
-          You Have Won!!!
-        </div>
-        <div v-else-if="victor == 'tie'">
-          You Have Tied With Someone!
-        </div>
-        <div v-else-if="victor == 'lost'">
-          You Have Lost :(
-        </div>
+        <div v-if="victor == 'won'">You Have Won!!!</div>
+        <div v-else-if="victor == 'tie'">You Have Tied With Someone!</div>
+        <div v-else-if="victor == 'lost'">You Have Lost :(</div>
         <button @click="playAgain">Play Again?</button>
       </div>
       <div v-for="(player, index) in players" :key="index" class="players">
@@ -37,27 +31,32 @@
           <br />
           Score: {{ player.cardScore }}
         </div>
-        <div v-if="player.blackJack && player.name === name">
-          BlackJack!!!
-        </div>
+        <div v-if="player.blackJack && player.name === name">BlackJack!!!</div>
         <div v-if="player.busted && player.name === name">Busted!!!</div>
-        <div v-for="(cards, index) in player.hand" :key="cards.code">
-          <img
-            v-if="index === 0 && player.name !== name"
-            src="../../deck/images/back.png"
-            alt="back"
-            class="card-image"
-          />
-          <img v-else :src="cards.image" :alt="cards.code" class="card-image" />
+        <div class="player-hand">
+          <div v-for="(cards, index) in player.hand" :key="cards.code">
+            <img
+              v-if="index === 0 && player.name !== name"
+              src="../../deck/images/back.png"
+              alt="back"
+              class="card-image"
+            />
+            <img
+              v-else
+              :src="cards.image"
+              :alt="cards.code"
+              class="card-image"
+            />
+          </div>
         </div>
         <button
           v-if="
             canHit === true &&
-              player.name == name &&
-              player.turnOrder === 1 &&
-              busted !== true &&
-              blackJack !== true &&
-              finished !== true
+            player.name == name &&
+            player.turnOrder === 1 &&
+            busted !== true &&
+            blackJack !== true &&
+            finished !== true
           "
           @click="hit(player)"
         >
@@ -70,16 +69,16 @@
               player.turnOrder === 1 &&
               player.played === false &&
               finished !== true) ||
-              (player.busted === true &&
-                player.name === name &&
-                player.played === false &&
-                player.turnOrder === 1 &&
-                finished !== true) ||
-              (player.blackJack !== true &&
-                player.name === name &&
-                player.played === false &&
-                player.turnOrder === 1 &&
-                finished !== true)
+            (player.busted === true &&
+              player.name === name &&
+              player.played === false &&
+              player.turnOrder === 1 &&
+              finished !== true) ||
+            (player.blackJack !== true &&
+              player.name === name &&
+              player.played === false &&
+              player.turnOrder === 1 &&
+              finished !== true)
           "
           @click="stand(player)"
         >
@@ -111,7 +110,7 @@ export default {
       players: [],
       lobby: "../../views/Lobbies/BlackJackLobby.vue",
       i: 0,
-      gameStarted: false
+      gameStarted: false,
     };
   },
   async mounted() {
@@ -120,19 +119,19 @@ export default {
     this.master = this.$route.params.data.master;
     console.log("connected to the game!");
     let game = await database.collection("games").doc(`blackjack${this.code}`);
-    game.onSnapshot(snapshot => {
+    game.onSnapshot((snapshot) => {
       let data = snapshot.data();
       this.deck = data.deck;
       this.players = data.gamePlayers;
       this.finished = data.finished;
-      data.gamePlayers.forEach(player => {
+      data.gamePlayers.forEach((player) => {
         if (player.turnOrder === 1) {
           player.canHit = true;
           if (player.name == this.name) {
             this.canHit = true;
           }
           if (player.name == this.name) {
-            player.hand.forEach(hand => {
+            player.hand.forEach((hand) => {
               this.cardScore = hand.blackjack;
             });
           }
@@ -145,10 +144,10 @@ export default {
     });
     //dealing
     if (this.master === true) {
-      game.get().then(doc => {
+      game.get().then((doc) => {
         let players = doc.data().gamePlayers;
         this.randomizeOrder(players);
-        players.forEach(player => {
+        players.forEach((player) => {
           for (let i = 0; i < 2; i++) {
             let randomCard = this.deck[this.randomDeck()];
             player.hand.push(randomCard);
@@ -161,7 +160,7 @@ export default {
         });
         game.update({
           deck: this.deck,
-          gamePlayers: players
+          gamePlayers: players,
         });
       });
     }
@@ -178,7 +177,7 @@ export default {
       this.deck.splice(remove, 1);
       playerHand.cardScore +=
         playerHand.hand[playerHand.hand.length - 1].blackjack;
-      playerHand.hand.forEach(card => {
+      playerHand.hand.forEach((card) => {
         if (card.value === "ACE") {
           if (playerHand.cardScore >= 21 && card.blackjack != 1) {
             playerHand.cardScore -= card.blackjack;
@@ -215,7 +214,7 @@ export default {
         playerStats.played = true;
       }
       if (playerStats.played === true) {
-        this.players.forEach(player => {
+        this.players.forEach((player) => {
           player.turnOrder -= 1;
           if (player.turnOrder <= 0) {
             player.turnOrder = this.players.length;
@@ -233,20 +232,17 @@ export default {
         this.gameStarted = false;
         this.determineWinner();
       }
-      database
-        .collection("games")
-        .doc(`blackjack${this.code}`)
-        .update({
-          gamePlayers: this.players,
-          finished: this.finished,
-          gameStarted: this.gameStarted
-        });
+      database.collection("games").doc(`blackjack${this.code}`).update({
+        gamePlayers: this.players,
+        finished: this.finished,
+        gameStarted: this.gameStarted,
+      });
     },
     determineWinner() {
       let cardScores = [];
       let opposingVictor = false;
       let opposingBusted = false;
-      this.players.forEach(player => {
+      this.players.forEach((player) => {
         if (player.name !== this.name) {
           if (player.blackJack === true) {
             opposingVictor = true;
@@ -279,18 +275,15 @@ export default {
       } else {
         this.victor = "lost";
       }
-      this.players.forEach(player => {
+      this.players.forEach((player) => {
         if (player.name === this.name) {
           player.victor = this.victor;
         }
       });
       console.log(this.victor, this.players);
-      database
-        .collection("games")
-        .doc(`blackjack${this.code}`)
-        .update({
-          gamePlayers: this.players
-        });
+      database.collection("games").doc(`blackjack${this.code}`).update({
+        gamePlayers: this.players,
+      });
     },
     randomizeOrder(players) {
       let totalPlayers = players.length;
@@ -298,7 +291,7 @@ export default {
       for (let i = 1; i <= totalPlayers; i++) {
         order.push(i);
       }
-      players.forEach(player => {
+      players.forEach((player) => {
         let random = Math.floor(Math.random() * order.length);
         player.turnOrder = order[random];
         order.splice(random, 1);
@@ -308,37 +301,38 @@ export default {
       let game = await database
         .collection("games")
         .doc(`blackjack${this.code}`);
-      game.get().then(doc => {
+      game.get().then((doc) => {
         let lobbyPeople = doc.data().lobby.lobbyPlayers;
         lobbyPeople.push({
           master: this.master,
-          name: this.name
+          name: this.name,
         });
         game.update(
           {
             lobby: {
-              lobbyPlayers: lobbyPeople
-            }
+              lobbyPlayers: lobbyPeople,
+            },
           },
           {
-            merge: true
+            merge: true,
           }
         );
       });
       let data = {
         name: this.name,
         code: this.code,
-        master: this.master
+        master: this.master,
       };
       this.$router.push({ name: "BlackjackRoom", params: { data } });
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
 .game-interface {
-  font-size: 20px;
+  font-size: 2rem;
+  text-align: center;
 }
 #leave {
   display: block;
@@ -350,6 +344,11 @@ export default {
   width: 100%;
 }
 .card-image {
-  width: 10%;
+  width: 60%;
+}
+
+.player-hand {
+  display: flex;
+  font-size: 2rem;
 }
 </style>

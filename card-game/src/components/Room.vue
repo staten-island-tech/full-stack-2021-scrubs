@@ -1,22 +1,33 @@
 <template>
   <div>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
     <button id="leave">
       <router-link to="Games">Leave</router-link>
     </button>
     <div class="game-interface">
-      <div>Code: {{ code }}</div>
-      <p v-for="(player, index) in playerNames" :key="index">
+      <div class="room-code">Code: {{ code }}</div>
+      <p class="player" v-for="(player, index) in playerNames" :key="index">
         {{ player.name }}
       </p>
       <button
+        class="start-btn"
         v-if="!disableStart && playersInLobby > 1 && master === true"
         @click="start"
       >
         Start
       </button>
-      <p v-if="playersInLobby <= 1">Waiting for more people to join...</p>
-      <p v-if="!master">Waiting for host to start...</p>
-      <p v-if="disableStart">Waiting for game to load...</p>
+      <p class="joining" v-if="playersInLobby <= 1">
+        Waiting for more people to join...
+      </p>
+      <p class="joining" v-if="!master">Waiting for host to start...</p>
+      <p class="joining" v-if="disableStart">Waiting for game to load...</p>
     </div>
   </div>
 </template>
@@ -32,11 +43,11 @@ export default {
       disableStart: false,
       name: "",
       playersInLobby: 0,
-      playerNames: []
+      playerNames: [],
     };
   },
   props: {
-    game: String
+    game: String,
   },
   async mounted() {
     this.code = this.$route.params.data.code;
@@ -46,13 +57,13 @@ export default {
     let db = await database.collection("games").doc(`blackjack${this.code}`);
     db.update(
       {
-        players: ""
+        players: "",
       },
       {
-        merge: true
+        merge: true,
       }
     );
-    db.get().then(async snapshot => {
+    db.get().then(async (snapshot) => {
       let players = snapshot.data().gamePlayers;
       if (players.length > 1) {
         players = [];
@@ -69,16 +80,16 @@ export default {
         played: false,
         stand: false,
         result: "",
-        victor: ""
+        victor: "",
       });
       console.log(players);
       db.update({
         deck: deck,
         gameStarted: false,
-        gamePlayers: players
+        gamePlayers: players,
       });
     });
-    db.onSnapshot(async snapshot => {
+    db.onSnapshot(async (snapshot) => {
       let gameLobby = await snapshot.data().lobby;
       this.playersInLobby = await gameLobby.lobbyPlayers.length;
       for (let i = 0; i < gameLobby.lobbyPlayers.length; i++) {
@@ -91,7 +102,7 @@ export default {
         let data = {
           name: this.name,
           master: this.master,
-          code: this.code
+          code: this.code,
         };
         this.$router.push({ name: this.game, params: { data } });
       }
@@ -106,17 +117,68 @@ export default {
         {
           gameStarted: true,
           lobby: {
-            lobbyPlayers: []
+            lobbyPlayers: [],
           },
-          finished: false
+          finished: false,
         },
         {
-          merge: true
+          merge: true,
         }
       );
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss">
+#leave {
+  color: #ffd600;
+  background: rgba(35, 17, 35, 0.42);
+  border: 1px solid #231123;
+  box-shadow: 0px 4px 17px rgba(152, 73, 0, 0.25);
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+}
+
+#leave:visited {
+  color: #ffd600;
+}
+
+.joining {
+  font-size: 2rem;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+}
+
+.player {
+  font-size: 2rem;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+}
+
+.room-code {
+  font-size: 2rem;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+}
+
+.start-btn {
+  color: #ffd600;
+  background: rgba(35, 17, 35, 0.42);
+  border: 1px solid #231123;
+  box-shadow: 0px 4px 17px rgba(152, 73, 0, 0.25);
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+}
+</style>

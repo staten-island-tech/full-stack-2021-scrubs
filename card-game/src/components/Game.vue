@@ -7,7 +7,7 @@
       <hr />
       {{ lobbyName }}
       <hr />
-      <p v-for="player in players" :key="player">
+      <p class="player" v-for="player in players" :key="player">
         {{ player }}
       </p>
       <button @click="deal">Start</button>
@@ -34,7 +34,7 @@ export default {
   props: {
     lobby: String,
     draw: Number,
-    playerHand: Array
+    playerHand: Array,
   },
   data() {
     return {
@@ -44,7 +44,7 @@ export default {
       gameStarted: false,
       rotation: false,
       spectate: true,
-      finished: false
+      finished: false,
     };
   },
   methods: {
@@ -54,8 +54,8 @@ export default {
       /*       console.log(this.deck);
       console.log(this.playerHand); */
       console.log(randomDeal);
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -73,6 +73,7 @@ export default {
   width: 100%;
   display: flex;
 }
+
 img {
   width: 50%;
 }

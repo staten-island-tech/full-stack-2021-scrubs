@@ -147,6 +147,10 @@ export default {
 </script>
 
 <style lang="scss">
+.container {
+  text-align: center;
+}
+
 .player-button {
   color: #ffd600;
   background: rgba(35, 17, 35, 0.42);
