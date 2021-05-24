@@ -363,7 +363,7 @@ export default {
   font-family: Roboto;
   font-style: normal;
   font-weight: normal;
-  font-size: 4rem;
+  font-size: 3.5rem;
 }
 .game-text {
   font-family: Roboto;

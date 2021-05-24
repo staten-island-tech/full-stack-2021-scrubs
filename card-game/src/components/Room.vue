@@ -11,7 +11,7 @@
     <button class="leave">
       <router-link to="/">Leave</router-link>
     </button>
-    <div class="game-interface">
+    <div class="room-interface">
       <div class="room-code">Code: {{ code }}</div>
       <p class="player" v-for="(player, index) in playerNames" :key="index">
         {{ player.name }}
@@ -128,41 +128,22 @@ export default {
 </script>
 
 <style lang="scss">
-.leave {
-  color: #ffd600;
-  background: gray;
-  border: 1px solid #231123;
-  box-shadow: 0px 4px 17px rgba(152, 73, 0, 0.25);
-  border-radius: 5px;
-  text-decoration: none;
-  font-size: 1.5rem;
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  margin-top: 10%;
-}
-
-.leave:visited {
-  color: #ffd600;
-  text-decoration: none;
-}
-
 .joining {
-  font-size: 2rem;
+  font-size: 3.5rem;
   font-family: Roboto;
   font-style: normal;
   font-weight: normal;
 }
 
 .player {
-  font-size: 2rem;
+  font-size: 3.5rem;
   font-family: Roboto;
   font-style: normal;
   font-weight: normal;
 }
 
 .room-code {
-  font-size: 2rem;
+  font-size: 3.5rem;
   font-family: Roboto;
   font-style: normal;
   font-weight: normal;
@@ -175,9 +156,46 @@ export default {
   box-shadow: 0px 4px 17px rgba(152, 73, 0, 0.25);
   border-radius: 5px;
   text-decoration: none;
-  font-size: 1.5rem;
+  font-size: 3.5rem;
   font-family: Roboto;
   font-style: normal;
   font-weight: normal;
+}
+
+.room-interface {
+  color: #ffd600;
+  background: rgba(35, 17, 35, 0.42);
+  border: 1px solid #231123;
+  box-shadow: 0px 4px 17px rgba(152, 73, 0, 0.25);
+  border-radius: 5px;
+  margin-top: 3%;
+  font-size: 2rem;
+}
+
+a {
+  text-decoration: none;
+  color: #ffd600;
+  background: none;
+  text-decoration: none;
+  font-size: 2.5rem;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  margin-top: 10%;
+}
+
+.leave {
+  text-decoration: none;
+  color: #ffd600;
+  background: rgba(35, 17, 35, 0.42);
+  border: 1px solid #231123;
+  box-shadow: 0px 4px 17px rgba(152, 73, 0, 0.25);
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 2.5rem;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  margin-top: 10%;
 }
 </style>

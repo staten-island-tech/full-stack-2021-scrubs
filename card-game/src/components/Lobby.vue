@@ -5,7 +5,6 @@
       rel="stylesheet"
     />
     <router-link class="lobby-back" id="games" to="/">Back</router-link>
-    <div>{{ gameType }}</div>
     <br />
     <div class="player" v-if="play">
       <h3>Playing As: {{ playerStatus.name }}</h3>
