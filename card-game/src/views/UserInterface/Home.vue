@@ -95,7 +95,7 @@ body {
 }
 
 @mixin desktop {
-  @media (min-width: 1100px) {
+  @media (min-width: 1500px) {
     @content;
   }
 }
@@ -103,10 +103,11 @@ body {
 .container {
   height: 100vh;
   background-image: radial-gradient(
-    50% 50% at 50% 50%,
-    rgba(#ac0000, 0.87) 0%,
-    rgba(#690000, 0.87) 100%
-  );
+      50% 50% at 50% 50%,
+      rgba(#ac0000, 0.87) 0%,
+      rgba(#690000, 0.87) 100%
+    ),
+    url(https://i.imgur.com/e4q9SB0.jpg);
 }
 
 .container-buttons {

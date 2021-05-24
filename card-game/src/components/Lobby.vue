@@ -1,5 +1,9 @@
 <template>
   <section class="container" id="lobby">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
     <router-link class="lobby-back" id="games" to="/">Back</router-link>
     <div>{{ gameType }}</div>
     <br />
@@ -151,6 +155,24 @@ export default {
   text-align: center;
 }
 
+h3 {
+  font-size: 4rem;
+  color: #ffd600;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  -webkit-text-stroke: 1.3px black;
+}
+
+h5 {
+  font-size: 4rem;
+  color: #ffd600;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  -webkit-text-stroke: 1.3px black;
+}
+
 .player-button {
   color: #ffd600;
   background: rgba(35, 17, 35, 0.42);
@@ -181,7 +203,7 @@ export default {
 .lobby-back {
   position: absolute;
   left: 48%;
-  top: 50%;
+  top: 55%;
   font-size: 3rem;
   color: #ffd600;
   background: rgba(35, 17, 35, 0.42);
