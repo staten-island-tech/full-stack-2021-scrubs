@@ -256,7 +256,7 @@ export default {
       } else if (
         (this.blackJack === true && opposingVictor !== true) ||
         (this.cardScore > Math.max(cardScores) === true &&
-          opposingVictor !== true)
+          opposingVictor !== true && this.busted !== true)
       ) {
         this.victor = "won";
       } else {
