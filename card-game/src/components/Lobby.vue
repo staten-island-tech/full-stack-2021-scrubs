@@ -213,7 +213,6 @@ h5 {
 .lobby-back {
   position: absolute;
   left: 48%;
-  top: 55%;
   font-size: 3rem;
   color: #ffd600;
   background: rgba(35, 17, 35, 0.42);
