@@ -33,21 +33,14 @@
         </div>
         <div v-if="player.blackJack && player.name === name">BlackJack!!!</div>
         <div v-if="player.busted && player.name === name">Busted!!!</div>
-        <div class="player-hand">
-          <div v-for="(cards, index) in player.hand" :key="cards.code">
-            <img
-              v-if="index === 0 && player.name !== name"
-              src="../../deck/images/back.png"
-              alt="back"
-              class="card-image"
-            />
-            <img
-              v-else
-              :src="cards.image"
-              :alt="cards.code"
-              class="card-image"
-            />
-          </div>
+        <div v-for="(cards, index) in player.hand" :key="cards.code">
+          <img
+            v-if="index === 0 && player.name !== name"
+            src="../../deck/images/back.png"
+            alt="back"
+            class="card-image"
+          />
+          <img v-else :src="cards.image" :alt="cards.code" class="card-image" />
         </div>
         <button
           v-if="
@@ -344,11 +337,6 @@ export default {
   width: 100%;
 }
 .card-image {
-  width: 60%;
-}
-
-.player-hand {
-  display: flex;
-  font-size: 2rem;
+  width: 10%;
 }
 </style>
