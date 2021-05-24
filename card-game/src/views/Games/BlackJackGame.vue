@@ -110,7 +110,6 @@ export default {
     this.code = this.$route.params.data.code;
     this.name = this.$route.params.data.name;
     this.master = this.$route.params.data.master;
-    console.log("connected to the game!");
     let game = await database.collection("games").doc(`blackjack${this.code}`);
     game.onSnapshot((snapshot) => {
       let data = snapshot.data();
@@ -122,11 +121,7 @@ export default {
           player.canHit = true;
           if (player.name == this.name) {
             this.canHit = true;
-          }
-          if (player.name == this.name) {
-            player.hand.forEach((hand) => {
-              this.cardScore = hand.blackjack;
-            });
+            this.cardScore = player.cardScore
           }
         }
       });
@@ -248,7 +243,6 @@ export default {
           }
         }
       });
-      console.log(Math.max(cardScores), opposingVictor);
       if (
         (this.blackJack === true && opposingVictor === true) ||
         (this.busted === true &&
@@ -273,7 +267,6 @@ export default {
           player.victor = this.victor;
         }
       });
-      console.log(this.victor, this.players);
       database.collection("games").doc(`blackjack${this.code}`).update({
         gamePlayers: this.players,
       });

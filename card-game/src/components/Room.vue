@@ -53,7 +53,6 @@ export default {
     this.code = this.$route.params.data.code;
     this.name = this.$route.params.data.name;
     this.master = this.$route.params.data.master;
-    console.log("connected");
     let db = await database.collection("games").doc(`blackjack${this.code}`);
     db.update(
       {
@@ -67,7 +66,6 @@ export default {
       let players = snapshot.data().gamePlayers;
       if (players.length > 1) {
         players = [];
-        console.log(players);
       }
       players.push({
         cardScore: 0,
@@ -82,7 +80,6 @@ export default {
         result: "",
         victor: "",
       });
-      console.log(players);
       db.update({
         deck: deck,
         gameStarted: false,
