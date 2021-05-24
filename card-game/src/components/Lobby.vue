@@ -222,7 +222,7 @@ h5 {
   text-decoration: none;
   width: 8rem;
   @include laptop {
-    top: 62%;
+    top: 75%;
   }
   @include desktop {
     top: 55%;
