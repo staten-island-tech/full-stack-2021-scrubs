@@ -94,6 +94,12 @@ body {
   }
 }
 
+@mixin desktop {
+  @media (min-width: 1100px) {
+    @content;
+  }
+}
+
 .container {
   height: 100vh;
   background-image: radial-gradient(
@@ -130,8 +136,6 @@ body {
   font-style: normal;
   font-weight: normal;
   position: absolute;
-  left: 32.5%;
-  width: 35%;
   border-radius: 2.5rem;
 
   color: #ffd600;
@@ -139,6 +143,10 @@ body {
   @include laptop {
     width: 45%;
     left: 30%;
+  }
+  @include desktop {
+    left: 33%;
+    width: 33.75%;
   }
 }
 
