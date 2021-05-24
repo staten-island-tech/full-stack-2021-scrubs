@@ -88,6 +88,12 @@ body {
   margin: 0;
 }
 
+@mixin laptop {
+  @media (min-width: 900px) {
+    @content;
+  }
+}
+
 .container {
   height: 100vh;
   background-image: radial-gradient(
@@ -130,6 +136,10 @@ body {
 
   color: #ffd600;
   text-shadow: 0.5rem 0.5rem 0.5rem #231123;
+  @include laptop {
+    width: 45%;
+    left: 30%;
+  }
 }
 
 .play-game {
