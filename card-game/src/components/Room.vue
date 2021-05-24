@@ -9,7 +9,7 @@
       rel="stylesheet"
     />
     <button id="leave">
-      <router-link to="Games">Leave</router-link>
+      <router-link to="/">Leave</router-link>
     </button>
     <div class="game-interface">
       <div class="room-code">Code: {{ code }}</div>
