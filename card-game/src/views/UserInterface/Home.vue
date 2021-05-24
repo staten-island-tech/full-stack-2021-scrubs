@@ -107,7 +107,7 @@ body {
       rgba(#ac0000, 0.87) 0%,
       rgba(#690000, 0.87) 100%
     ),
-    url(https://i.imgur.com/e4q9SB0.jpg);
+    url(../../assets/vegasbkgd.jpg);
 }
 
 .container-buttons {

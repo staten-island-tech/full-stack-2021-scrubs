@@ -1,46 +1,78 @@
 <template>
   <div>
     <div class="game-interface">
+      <link
+        href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+        rel="stylesheet"
+      />
       <div v-if="finished === true">
-        <div v-if="victor == 'won'">You Have Won!!!</div>
-        <div v-else-if="victor == 'tie'">You Have Tied With Someone!</div>
-        <div v-else-if="victor == 'lost'">You Have Lost :(</div>
+        <div class="end-text" v-if="victor == 'won'">You Have Won!!!</div>
+        <div class="end-text" v-else-if="victor == 'tie'">
+          You Have Tied With Someone!
+        </div>
+        <div class="end-text" v-else-if="victor == 'lost'">
+          You Have Lost :(
+        </div>
         <button @click="playAgain">Play Again?</button>
       </div>
-      <div v-for="(player, index) in players" :key="index" class="players">
-        <div v-if="player.turnOrder == 1 && player.name !== name">
+      <div
+        v-for="(player, index) in players"
+        :key="index"
+        class="players game-text"
+      >
+        <div
+          class="game-text"
+          v-if="player.turnOrder == 1 && player.name !== name"
+        >
           {{ player.name }}'s Turn
         </div>
-        <div v-else-if="player.turnOrder == 1 && player.name === name">
+        <div
+          class="game-text"
+          v-else-if="player.turnOrder == 1 && player.name === name"
+        >
           Your Turn
         </div>
         <div
+          class="game-text"
           v-if="
             player.turnOrder != 1 && player.name == name && finished !== true
           "
         >
           Waiting for a player...
         </div>
-        <div v-if="player.name !== name && finished !== true">
+        <div class="game-text" v-if="player.name !== name && finished !== true">
           {{ player.name }}
           <br />
           Score: ???
         </div>
-        <div v-else>
+        <div class="game-text" v-else>
           You
           <br />
           Score: {{ player.cardScore }}
         </div>
-        <div v-if="player.blackJack && player.name === name">BlackJack!!!</div>
-        <div v-if="player.busted && player.name === name">Busted!!!</div>
-        <div v-for="(cards, index) in player.hand" :key="cards.code">
-          <img
-            v-if="index === 0 && player.name !== name"
-            src="../../deck/images/back.png"
-            alt="back"
-            class="card-image"
-          />
-          <img v-else :src="cards.image" :alt="cards.code" class="card-image" />
+        <div class="game-text" v-if="player.blackJack && player.name === name">
+          BlackJack!!!
+        </div>
+        <div class="game-text" v-if="player.busted && player.name === name">
+          Busted!!!
+        </div>
+        <div class="card-hand">
+          <div v-for="(cards, index) in player.hand" :key="cards.code">
+            <img
+              v-if="index === 0 && player.name !== name"
+              src="../../deck/images/back.png"
+              alt="back"
+              class="card-image"
+              id="card-back"
+            />
+            <img
+              v-else
+              :src="cards.image"
+              :alt="cards.code"
+              class="card-image"
+              id="card-front"
+            />
+          </div>
         </div>
         <button
           v-if="
@@ -121,7 +153,7 @@ export default {
           player.canHit = true;
           if (player.name == this.name) {
             this.canHit = true;
-            this.cardScore = player.cardScore
+            this.cardScore = player.cardScore;
           }
         }
       });
@@ -256,7 +288,8 @@ export default {
       } else if (
         (this.blackJack === true && opposingVictor !== true) ||
         (this.cardScore > Math.max(cardScores) === true &&
-          opposingVictor !== true && this.busted !== true)
+          opposingVictor !== true &&
+          this.busted !== true)
       ) {
         this.victor = "won";
       } else {
@@ -317,19 +350,45 @@ export default {
 
 <style lang="scss" scoped>
 .game-interface {
+  height: 100vh;
+  background-image: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(#315f48, 0.87) 0%,
+    rgba(#163d2a, 0.87) 100%
+  );
   font-size: 2rem;
   text-align: center;
 }
+.end-text {
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 4rem;
+}
+.game-text {
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 2rem;
+}
+
 #leave {
   display: block;
   text-align: left;
+}
+.card-hand {
+  display: flex;
+  justify-content: space-evenly;
 }
 .players {
   justify-content: space-evenly;
   font-size: 10px;
   width: 100%;
 }
-.card-image {
-  width: 10%;
+#card-back {
+  width: 20rem;
+}
+#card-front {
+  width: 19rem;
 }
 </style>

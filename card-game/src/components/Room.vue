@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap"
@@ -8,7 +8,7 @@
       href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
       rel="stylesheet"
     />
-    <button id="leave">
+    <button class="leave">
       <router-link to="/">Leave</router-link>
     </button>
     <div class="game-interface">
@@ -128,9 +128,9 @@ export default {
 </script>
 
 <style lang="scss">
-#leave {
+.leave {
   color: #ffd600;
-  background: rgba(35, 17, 35, 0.42);
+  background: gray;
   border: 1px solid #231123;
   box-shadow: 0px 4px 17px rgba(152, 73, 0, 0.25);
   border-radius: 5px;
@@ -139,10 +139,12 @@ export default {
   font-family: Roboto;
   font-style: normal;
   font-weight: normal;
+  margin-top: 10%;
 }
 
-#leave:visited {
+.leave:visited {
   color: #ffd600;
+  text-decoration: none;
 }
 
 .joining {

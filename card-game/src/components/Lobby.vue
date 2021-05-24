@@ -17,6 +17,7 @@
         <br />
         <input
           type="text"
+          aria-label="room-code"
           class="code"
           placeholder="Put in the 4 digit code"
           v-model="joinCode"
@@ -151,6 +152,16 @@ export default {
 </script>
 
 <style lang="scss">
+@mixin laptop {
+  @media (min-width: 900px) {
+    @content;
+  }
+}
+@mixin desktop {
+  @media (min-width: 1500px) {
+    @content;
+  }
+}
 .container {
   text-align: center;
 }
@@ -212,6 +223,12 @@ h5 {
   border-radius: 5px;
   text-decoration: none;
   width: 8rem;
+  @include laptop {
+    top: 62%;
+  }
+  @include desktop {
+    top: 55%;
+  }
 }
 </style>
 
