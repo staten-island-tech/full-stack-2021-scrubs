@@ -59,7 +59,7 @@
         <div class="card-hand">
           <div v-for="(cards, index) in player.hand" :key="cards.code">
             <img
-              v-if="index === 0 && player.name !== name"
+              v-if="index === 0 && player.name !== name && finished !== true"
               src="../../deck/images/back.png"
               alt="back"
               class="card-image"

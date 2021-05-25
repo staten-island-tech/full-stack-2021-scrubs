@@ -64,9 +64,6 @@ export default {
     );
     db.get().then(async (snapshot) => {
       let players = snapshot.data().gamePlayers;
-      if (players.length > 1) {
-        players = [];
-      }
       players.push({
         cardScore: 0,
         hand: [],
@@ -80,6 +77,9 @@ export default {
         result: "",
         victor: "",
       });
+      if (players.length > 3){
+        players.splice(0,2)
+      }
       db.update({
         deck: deck,
         gameStarted: false,
