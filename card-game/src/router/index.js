@@ -4,7 +4,6 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/UserInterface/Home.vue";
 
-
 Vue.use(VueRouter);
 
 const originalPush = VueRouter.prototype.push;

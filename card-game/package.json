@@ -1,5 +1,5 @@
 {
-  "name": "card-game",
+  "name": "basic-testing",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,9 +8,9 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@firebase/app": "^0.6.15",
     "core-js": "^3.6.5",
-    "firebase": "^8.2.6",
+    "dotenv": "^8.2.0",
+    "firebase": "^8.2.9",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0"
   },
