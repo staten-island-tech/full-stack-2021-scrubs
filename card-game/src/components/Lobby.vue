@@ -157,7 +157,7 @@ export default {
   }
 }
 @mixin desktop {
-  @media (min-width: 1500px) {
+  @media (min-width: 1800px) {
     @content;
   }
 }
